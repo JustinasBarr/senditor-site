@@ -1,0 +1,1758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" id="themeColor" content="#F7F4EF">
+<title>Senditor — Client sign-off for paid Meta ads</title>
+<meta name="description" content="A private, operator-run pilot for cleaner Meta ad sign-off: check the creative, capture the exact client decision, and test publishing the approved ad to Meta as PAUSED without touching activation.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Crect%20width=%2232%22%20height=%2232%22%20rx=%227%22%20fill=%22%232C46D8%22/%3E%3Cpath%20d=%22M8%2022V10l5%207%205-7v12%22%20fill=%22none%22%20stroke=%22%23F7F4EF%22%20stroke-width=%223%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3Ccircle%20cx=%2223.5%22%20cy=%2219.5%22%20r=%222.5%22%20fill=%22%23F7F4EF%22/%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js");</script>
+<link rel="preload" as="image" href="assets/spring-launch-v2.webp" type="image/webp">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ---------- base ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--f-ui);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a,button,input,select,textarea{touch-action:manipulation}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:var(--r-xs)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0}
+.no-js-only{display:none;width:100%;margin-top:var(--s-6)}
+
+.skip-link{position:absolute;left:var(--s-4);top:-60px;z-index:100;background:var(--brand);color:var(--brand-ink);
+  padding:var(--s-3) var(--s-5);border-radius:var(--r-sm);font-weight:600;text-decoration:none;
+  transition:top var(--dur-fast) var(--ease)}
+.skip-link:focus{top:var(--s-4)}
+
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:var(--s-6)}
+@media(min-width:1440px){.wrap{max-width:1280px}}
+
+/* plates & chips */
+.plate{font-family:var(--f-ui);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.mono{font-family:var(--f-mono)}
+.chip{display:inline-flex;align-items:center;gap:var(--s-15);padding:var(--s-1) var(--s-3);border-radius:var(--r-full);
+  font-size:12px;font-weight:600;line-height:1.2;border:1px solid transparent}
+.chip.is-ok{background:var(--ok-soft);color:var(--ok)}
+.chip.is-warn{background:var(--warn-soft);color:var(--warn)}
+.chip.is-held{background:var(--held-soft);color:var(--held)}
+.chip.is-brand{background:var(--brand-soft);color:var(--brand)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:44px;
+  padding:var(--s-3) var(--s-6);border-radius:var(--r-md);font-weight:600;font-size:15px;text-decoration:none;
+  transition:background-color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease)}
+.btn-primary{background:var(--brand);color:var(--brand-ink);box-shadow:var(--shadow-1)}
+.btn-primary:hover{background:var(--brand-strong);transform:translateY(-1px);box-shadow:var(--shadow-2)}
+.btn-primary:active{transform:translateY(0) scale(.98);box-shadow:var(--shadow-1)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line-strong)}
+.btn-ghost:hover{border-color:var(--brand);background:var(--surface-2)}
+.btn-ghost:active{transform:scale(.98)}
+.btn[disabled],.btn[aria-disabled="true"]{background:var(--held-soft);color:var(--decor);cursor:not-allowed;box-shadow:none;transform:none}
+.tlink{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;
+  transition:color var(--dur-fast) var(--ease),text-underline-offset var(--dur-fast) var(--ease)}
+.tlink:hover{color:var(--brand);text-underline-offset:2px}
+
+/* theme toggle */
+.theme-toggle{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:var(--r-full);border:1px solid var(--line);color:var(--ink-2);
+  transition:color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.theme-toggle:hover{color:var(--ink);border-color:var(--line-strong)}
+.theme-toggle:active{transform:scale(.94)}
+.theme-toggle svg{transition:transform var(--dur) var(--ease)}
+.theme-toggle:hover svg{transform:rotate(90deg)}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;gap:var(--s-4);height:64px}
+.wordmark{min-height:44px;display:inline-flex;align-items:center;font-weight:700;font-size:17px;letter-spacing:-.01em;text-decoration:none}
+.wordmark .plate{margin-left:var(--s-2);padding:2px var(--s-2);border:1px solid var(--line-strong);border-radius:var(--r-full);vertical-align:2px}
+.nav-spacer{flex:1}
+@media(max-width:767px){.nav .btn{padding:var(--s-2) var(--s-4)}}
+@media(max-width:480px){
+  .nav-inner{gap:var(--s-2)}
+  .wordmark{white-space:nowrap}
+  .wordmark .plate{display:none}
+  .nav-spacer{min-width:0}
+  .nav .btn{flex:none;padding:var(--s-2) var(--s-3);font-size:14px}
+  .theme-toggle{flex:0 0 44px}
+}
+@media(max-width:359px){
+  #themeToggle{display:none}
+  .wordmark{font-size:16px}
+}
+
+/* ---------- hero ---------- */
+.hero{padding-block:0 var(--s-12)}
+.hero-intro{--hero-scroll:0;position:relative;display:grid;align-content:center;min-height:min(720px,calc(100svh - 64px));isolation:isolate}
+@media(min-width:1024px){.hero{padding-bottom:var(--s-16)}.hero-intro{min-height:min(760px,calc(100svh - 64px))}}
+.hero-copy{position:relative;z-index:2;max-width:760px}
+.hero-signal-field{position:absolute;z-index:0;left:50%;top:0;width:100vw;height:100%;overflow:hidden;pointer-events:none;
+  transform:translate3d(-50%,calc(var(--hero-scroll) * -24px),0);opacity:calc(1 - (var(--hero-scroll) * .28));will-change:transform,opacity}
+.hero-signal-field::before{content:"";position:absolute;inset:4% 0 2%;background-image:
+  linear-gradient(color-mix(in srgb,var(--line) 60%,transparent) 1px,transparent 1px),
+  linear-gradient(90deg,color-mix(in srgb,var(--line) 60%,transparent) 1px,transparent 1px);
+  background-size:76px 76px;mask-image:linear-gradient(90deg,transparent 2%,rgba(0,0,0,.18) 40%,#000 72%,transparent 100%);opacity:.3}
+.hero-signal-field::after{content:"";position:absolute;inset:-18% -8%;pointer-events:none;background:linear-gradient(112deg,transparent 28%,color-mix(in srgb,var(--surface-2) 72%,transparent) 45%,color-mix(in srgb,var(--brand) 8%,transparent) 51%,transparent 67%);opacity:0;transform:translate3d(24%,0,0)}
+.hero-signal-glow{position:absolute;width:min(760px,62vw);height:min(620px,82%);right:-8%;top:5%;border-radius:50%;
+  background:radial-gradient(circle at 55% 48%,color-mix(in srgb,var(--brand) 18%,transparent),color-mix(in srgb,var(--brand) 5%,transparent) 42%,transparent 70%);
+  filter:blur(12px);opacity:.82;transform:scale(1)}
+.hero-object-cluster{position:absolute;z-index:1;right:clamp(-34px,1vw,14px);top:50%;width:510px;height:480px;transform:translateY(-50%);pointer-events:none}
+.hero-orbit{position:absolute;z-index:0;border:1px solid color-mix(in srgb,var(--brand) 15%,var(--line));border-radius:50%;box-shadow:inset 0 0 60px color-mix(in srgb,var(--brand) 4%,transparent)}
+.hero-orbit.one{inset:26px 8px 4px 42px}.hero-orbit.two{inset:82px 66px 60px 96px;border-color:color-mix(in srgb,var(--ok) 14%,var(--line))}
+.hero-relay{position:absolute;z-index:1;inset:0;width:100%;height:100%;overflow:visible}
+.hero-relay-base,.hero-relay-progress{fill:none;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.hero-relay-base{stroke:color-mix(in srgb,var(--line-strong) 58%,transparent);stroke-width:1.25}
+.hero-relay-progress{stroke-width:2.4;filter:drop-shadow(0 4px 8px color-mix(in srgb,var(--brand) 22%,transparent))}
+.hero-relay-progress--approval{stroke:url(#heroRelayApproval)}
+.hero-relay-progress--meta{stroke:url(#heroRelayMeta)}
+.hero-relay-pulse{position:absolute;z-index:3;left:0;top:0;width:8px;height:8px;border:2px solid color-mix(in srgb,var(--surface-2) 86%,transparent);border-radius:50%;opacity:0;offset-position:0 0;offset-anchor:center;offset-rotate:0deg;will-change:offset-distance,opacity;box-shadow:0 0 0 6px color-mix(in srgb,currentColor 12%,transparent),0 4px 10px color-mix(in srgb,currentColor 28%,transparent)}
+.hero-relay-pulse--approval{color:var(--ok);background:var(--ok);offset-path:path("M 232 184 C 251 184 253 143 278 143")}
+.hero-relay-pulse--meta{color:var(--brand);background:var(--brand);offset-path:path("M 390 195 L 390 254")}
+.hero-cluster-label{position:absolute;z-index:3;left:24px;top:88px;display:flex;align-items:center;gap:9px;color:var(--ink-3);font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.hero-cluster-label::before{content:"";width:26px;height:1px;background:var(--brand)}
+.hero-file-tile{position:absolute;z-index:2;left:24px;top:132px;width:208px;padding:7px;border:1px solid color-mix(in srgb,var(--line-strong) 72%,transparent);border-radius:22px;background:color-mix(in srgb,var(--surface-2) 88%,transparent);box-shadow:0 30px 70px rgba(43,36,29,.16),inset 0 1px 0 color-mix(in srgb,#fff 78%,transparent);backdrop-filter:blur(18px) saturate(120%);transform:rotate(-3deg)}
+.hero-file-top{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 5px;color:var(--ink-3);font-family:var(--f-mono);font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.hero-file-version{display:inline-flex;align-items:center;min-height:21px;padding:2px 6px;border-radius:var(--r-full);background:var(--brand-faint);color:var(--brand)}
+.hero-file-tile img{display:block;width:100%;height:214px;object-fit:cover;border-radius:15px;background:var(--surface-2)}
+.hero-file-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 6px 5px}
+.hero-file-name{display:grid;gap:1px;min-width:0}.hero-file-name strong{color:var(--ink);font-size:11px;line-height:1.2}.hero-file-name small{color:var(--ink-3);font-family:var(--f-mono);font-size:9px;white-space:nowrap}
+.hero-file-lock{display:grid;place-items:center;flex:none;width:25px;height:25px;border-radius:50%;background:var(--brand);color:var(--brand-ink);font-size:11px;box-shadow:0 7px 16px color-mix(in srgb,var(--brand) 26%,transparent)}
+.hero-signal-card{position:absolute;z-index:2;right:8px;width:224px;min-height:104px;padding:14px 15px;border:1px solid color-mix(in srgb,var(--line-strong) 70%,transparent);border-radius:18px;background:color-mix(in srgb,var(--surface-2) 91%,transparent);box-shadow:0 22px 54px rgba(43,36,29,.14),inset 0 1px 0 color-mix(in srgb,#fff 74%,transparent);backdrop-filter:blur(20px) saturate(125%)}
+.hero-signal-card--approval{top:91px}.hero-signal-card--meta{top:254px}
+.hero-signal-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hero-signal-card-kicker{color:var(--ink-3);font-family:var(--f-mono);font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.hero-signal-card strong{display:block;margin-top:10px;color:var(--ink);font-family:var(--f-display);font-size:16px;line-height:1.08;letter-spacing:-.01em}
+.hero-signal-card small{display:block;margin-top:4px;color:var(--ink-3);font-size:10px;line-height:1.3}
+.hero-signal-check{display:grid;place-items:center;flex:none;width:27px;height:27px;border-radius:50%;background:var(--ok-soft);color:var(--ok);font-size:13px;font-weight:700}
+.hero-paused-chip{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:27px;padding:4px 8px;border-radius:var(--r-full);background:var(--brand-faint);color:var(--brand);font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.06em}
+.hero-paused-chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 12%,transparent)}
+.hero-signal-card::after{content:"";position:absolute;inset:-1px;border:1px solid currentColor;border-radius:inherit;opacity:0;transform:scale(.98);pointer-events:none}
+.js .hero-signal-field::before{opacity:0;transform:scale(1.025)}
+.js .hero-signal-glow{opacity:0;transform:translate3d(30px,12px,0) scale(.9)}
+.js .hero-relay-progress{stroke-dasharray:1;stroke-dashoffset:1}
+.js .hero-orbit,.js .hero-cluster-label,.js .hero-file-tile,.js .hero-signal-card{opacity:0}
+.played .hero-signal-field::before{opacity:.3;transform:none;transition:opacity 900ms var(--ease-out),transform 1200ms var(--ease-out)}
+.played .hero-signal-field::after{animation:hero-light-pass 1500ms var(--ease) 120ms both}
+.played .hero-signal-glow{opacity:.82;transform:scale(1);transition:opacity 1100ms var(--ease-out),transform 1400ms var(--ease-out)}
+.played .hero-relay-progress--approval{animation:hero-relay-draw 560ms var(--ease-out) 620ms forwards}
+.played .hero-relay-progress--meta{animation:hero-relay-draw 520ms var(--ease-out) 1320ms forwards}
+.played .hero-relay-pulse--approval{animation:hero-relay-pulse-cycle 7200ms linear 720ms infinite}
+.played .hero-relay-pulse--meta{animation:hero-relay-pulse-cycle 7200ms linear 1620ms infinite}
+.played .hero-orbit{animation:hero-orbit-arrive 1200ms var(--ease-out) both}.played .hero-orbit.two{animation-delay:120ms}
+.played .hero-cluster-label{animation:hero-cluster-label-arrive 600ms var(--ease-out) 360ms both}
+.played .hero-file-tile{animation:hero-file-arrive 820ms var(--ease-out) 430ms both}
+.played .hero-signal-card--approval{animation:hero-proof-arrive 680ms var(--ease-out) 900ms both}
+.played .hero-signal-card--meta{animation:hero-proof-arrive 680ms var(--ease-out) 1320ms both}
+.played .hero-file-lock{animation:hero-proof-confirm 520ms var(--ease-out) 700ms both}
+.played .hero-signal-card--approval::after{color:var(--ok);animation:hero-proof-ring 820ms var(--ease-out) 1180ms both}
+.played .hero-signal-card--meta::after{color:var(--brand);animation:hero-proof-ring 820ms var(--ease-out) 1700ms both}
+@keyframes hero-relay-draw{to{stroke-dashoffset:0}}
+@keyframes hero-relay-pulse-cycle{0%,1%{opacity:0;offset-distance:0}3%{opacity:1;offset-distance:0}12%{opacity:1;offset-distance:100%}14%,100%{opacity:0;offset-distance:100%}}
+@keyframes hero-light-pass{0%{opacity:0;transform:translate3d(24%,0,0)}38%{opacity:.72}100%{opacity:0;transform:translate3d(-18%,0,0)}}
+@keyframes hero-orbit-arrive{from{opacity:0;transform:scale(.84)}to{opacity:.72;transform:none}}
+@keyframes hero-cluster-label-arrive{from{opacity:0;transform:translate3d(12px,0,0)}to{opacity:1;transform:none}}
+@keyframes hero-file-arrive{from{opacity:0;transform:translate3d(34px,26px,0) rotate(1deg) scale(.93)}to{opacity:1;transform:rotate(-3deg)}}
+@keyframes hero-proof-arrive{from{opacity:0;transform:translate3d(22px,12px,0) scale(.94)}to{opacity:1;transform:none}}
+@keyframes hero-proof-confirm{from{opacity:.35;transform:scale(.78)}to{opacity:1;transform:none}}
+@keyframes hero-proof-ring{0%{opacity:0;transform:scale(.98)}34%{opacity:.42}100%{opacity:0;transform:scale(1.04)}}
+.h1{font-family:var(--f-display);font-weight:800;font-variation-settings:'wdth' 125;
+  font-size:clamp(34px,5.4vw,64px);line-height:1.08;letter-spacing:-.01em;margin-top:var(--s-4)}
+.hero-sub{margin-top:var(--s-5);font-size:17px;color:var(--ink-2);max-width:56ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:var(--s-4);margin-top:var(--s-8)}
+.microcopy{margin-top:var(--s-4);font-size:13px;color:var(--ink-3)}
+.microcopy .mono{font-weight:600;color:var(--ink-2)}
+
+/* reveal primitives — initial hidden states only under .js */
+.js .rise{opacity:0;transform:translateY(12px)}
+.played .rise{opacity:1;transform:none;transition:opacity 480ms var(--ease-out),transform 480ms var(--ease-out)}
+.played .rise.d1{transition-delay:120ms}.played .rise.d2{transition-delay:280ms}
+.played .rise.d3{transition-delay:440ms}.played .rise.d4{transition-delay:520ms}
+
+/* ---------- one-file chain of custody ---------- */
+.conveyor-zone{--conveyor-progress:1;margin-top:var(--s-16)}
+.js .conveyor-zone{--conveyor-progress:0}
+.conveyor-head{display:grid;grid-template-columns:minmax(0,760px) auto;align-items:end;justify-content:space-between;gap:var(--s-8)}
+.conveyor-intro .plate{color:var(--brand)}
+.conveyor-title{margin-top:var(--s-2);font-family:var(--f-display);font-size:clamp(28px,3.5vw,44px);font-weight:760;
+  font-variation-settings:'wdth' 116;line-height:1.06;letter-spacing:-.02em;text-wrap:balance}
+.conveyor-lede{max-width:68ch;margin-top:var(--s-3);color:var(--ink-2);font-size:16px;line-height:1.55;text-wrap:pretty}
+.conveyor-head .sample-band{align-self:start;white-space:nowrap}
+.track-wrap{position:relative;margin-top:var(--s-8)}
+.track{position:relative;height:460px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);
+  box-shadow:0 18px 60px rgba(34,29,25,.09),var(--shadow-1);overflow:hidden;isolation:isolate}
+.track::before{content:"";position:absolute;width:220px;height:220px;left:50%;top:72px;transform:translateX(-50%);
+  border-radius:50%;background:var(--brand-faint);filter:blur(26px);opacity:.72;z-index:-1}
+.track-context{position:absolute;left:50%;top:18px;z-index:4;transform:translateX(-50%);display:flex;align-items:center;gap:var(--s-3);
+  min-height:44px;padding:var(--s-2) var(--s-3);border:1px solid var(--line);border-radius:var(--r-full);background:var(--surface-2);
+  box-shadow:var(--shadow-1);white-space:nowrap}
+.track-context-label{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.track-file-lock{display:flex;align-items:center;gap:var(--s-2);min-width:0;font-family:var(--f-mono);font-size:11px;color:var(--ink-2)}
+.track-file-lock::before{content:"";width:1px;height:18px;background:var(--line)}
+.track-file-lock strong{max-width:190px;overflow:hidden;text-overflow:ellipsis;font-weight:500;color:var(--ink)}
+.track-file-lock span{display:inline-grid;place-items:center;min-width:24px;height:22px;border-radius:var(--r-full);background:var(--brand-soft);color:var(--brand);font-weight:600}
+.track-line{position:absolute;left:10%;right:10%;top:214px;height:4px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-radius:var(--r-full);filter:drop-shadow(0 1px 0 rgba(255,255,255,.72));overflow:visible}
+.track-segment{position:relative;background:var(--line);transition:background-color 360ms var(--ease)}
+.track-segment:first-child{border-radius:var(--r-full) 0 0 var(--r-full)}.track-segment:last-child{border-radius:0 var(--r-full) var(--r-full) 0}
+.track-segment::after{content:"";position:absolute;inset:0;background:var(--brand);transform:scaleX(0);transform-origin:left center;
+  transition:transform 520ms var(--ease-out),background-color 320ms var(--ease),box-shadow 320ms var(--ease)}
+.track-segment.is-active::after{transform:scaleX(1);background:linear-gradient(90deg,var(--brand),#6478F5);box-shadow:0 0 14px rgba(44,70,216,.28)}
+.track-segment.is-active::before{content:"";position:absolute;z-index:2;top:-2px;bottom:-2px;width:18%;min-width:22px;border-radius:var(--r-full);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);filter:blur(.4px);animation:rail-glint 920ms var(--ease-out) both}
+.track-segment.is-complete::after{transform:scaleX(1);background:var(--ok);box-shadow:0 0 10px color-mix(in srgb,var(--ok) 24%,transparent)}
+@keyframes rail-glint{from{left:-12%;opacity:0}20%{opacity:.9}to{left:94%;opacity:0}}
+.stations{position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.station{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;color:var(--ink-3)}
+.js .station{opacity:0;transform:scale(.96)}
+.conveyor-zone.played .station{opacity:1;transform:none;transition:opacity 320ms var(--ease-out),transform 320ms var(--ease-out)}
+.conveyor-zone.played .station:nth-child(1){transition-delay:80ms}.conveyor-zone.played .station:nth-child(2){transition-delay:140ms}
+.conveyor-zone.played .station:nth-child(3){transition-delay:200ms}.conveyor-zone.played .station:nth-child(4){transition-delay:260ms}
+.conveyor-zone.played .station:nth-child(5){transition-delay:320ms}
+.station-node{position:relative;width:24px;height:24px;border-radius:var(--r-full);background:var(--surface);
+  border:2px solid var(--line-strong);margin-top:204px;z-index:3;box-shadow:0 2px 8px rgba(34,29,25,.08);
+  transition:background-color 320ms var(--ease),border-color 320ms var(--ease),box-shadow 420ms var(--ease-out),transform 420ms var(--ease-out)}
+.station-node::before{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:var(--line-strong);transform:translate(-50%,-50%) scale(.8);
+  transition:background-color 260ms var(--ease),transform 420ms var(--ease-out),opacity 220ms var(--ease)}
+.station.is-active .station-node{border-color:var(--brand);background:var(--surface-2);box-shadow:0 0 0 7px var(--brand-faint),0 7px 20px rgba(44,70,216,.2);transform:scale(1.04)}
+.station.is-active .station-node::before{background:var(--brand);transform:translate(-50%,-50%) scale(1);animation:node-breathe 1.8s ease-in-out infinite}
+.station.is-complete .station-node{border-color:var(--ok);background:var(--ok);box-shadow:0 0 0 6px var(--ok-soft),0 6px 16px color-mix(in srgb,var(--ok) 22%,transparent);transform:none;animation:checkpoint-complete 560ms var(--ease-out) both}
+.station.is-complete .station-node::before{opacity:0;animation:none}
+.station.is-complete .station-node::after{content:"✓";position:absolute;inset:-2px;display:grid;place-items:center;color:var(--on-fill);font-size:12px;font-weight:750;animation:check-arrive 420ms var(--ease-out) both}
+@keyframes node-breathe{0%,100%{box-shadow:0 0 0 0 rgba(44,70,216,.2)}50%{box-shadow:0 0 0 5px rgba(44,70,216,0)}}
+@keyframes checkpoint-complete{0%{transform:scale(.9)}55%{transform:scale(1.16)}100%{transform:scale(1)}}
+@keyframes check-arrive{from{opacity:0;transform:scale(.5) rotate(-12deg)}to{opacity:1;transform:none}}
+.station-label{position:absolute;top:242px;width:100%;min-height:38px;text-align:center;transition:color 280ms var(--ease),transform 360ms var(--ease-out)}
+.station.is-active .station-label{color:var(--brand);transform:translateY(1px)}
+.station.is-complete .station-label{color:var(--ok)}
+.station-label .plate{display:block;font-size:11px;letter-spacing:.08em}
+.station.is-active .station-label .plate{color:var(--brand)}
+.station.is-complete .station-label .plate{color:var(--ok)}
+.station-tag{display:block;margin-top:2px;font-size:11px;color:var(--ink-3)}
+
+/* The active action becomes a legible evidence card, not a floating annotation. */
+.feedback-lane{position:absolute;inset:292px 24px 24px;display:grid;place-items:center}
+.station-feedback{grid-area:1/1;display:grid;grid-template-columns:68px minmax(0,1fr) auto;align-items:center;gap:var(--s-5);
+  width:min(760px,100%);min-height:128px;padding:var(--s-5) var(--s-6);border:1px solid color-mix(in srgb,var(--brand-ink) 18%,transparent);
+  border-radius:var(--r-lg);background:var(--brand);color:var(--brand-ink);box-shadow:0 16px 38px rgba(44,70,216,.22);pointer-events:none}
+.js .station-feedback{opacity:0;transform:translateY(8px) scale(.992);visibility:hidden;
+  transition:opacity 200ms var(--ease),transform 280ms var(--ease),visibility 0s linear 280ms}
+.js .station-feedback.show{opacity:1;transform:none;visibility:visible;
+  transition:opacity 320ms var(--ease-out),transform 440ms var(--ease-out),visibility 0s}
+.feedback-step{align-self:stretch;display:grid;align-content:center;justify-items:start;padding-right:var(--s-5);
+  border-right:1px solid color-mix(in srgb,var(--brand-ink) 24%,transparent)}
+.feedback-index{font-family:var(--f-display);font-size:34px;font-weight:760;line-height:1;letter-spacing:-.04em}
+.feedback-step-label{margin-top:4px;font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+.feedback-copy{display:grid;gap:6px;min-width:0;line-height:1.25}
+.feedback-copy strong{font-family:var(--f-display);font-size:20px;font-weight:700;letter-spacing:-.01em;color:var(--brand-ink)}
+.feedback-copy small{max-width:50ch;font-family:var(--f-ui);font-size:13px;font-weight:450;color:var(--brand-ink);line-height:1.42;opacity:.82}
+.feedback-proof{display:flex;align-items:center;justify-content:flex-end;gap:var(--s-2);min-width:178px;padding:10px var(--s-3);
+  border:1px solid color-mix(in srgb,var(--brand-ink) 22%,transparent);border-radius:var(--r-md);
+  background:color-mix(in srgb,var(--brand-ink) 9%,transparent);font-family:var(--f-mono);font-size:10px;color:var(--brand-ink)}
+.feedback-proof .proof-file{margin-top:0;color:var(--brand-ink)}
+.feedback-proof .proof-file strong,.feedback-proof .proof-file small{color:inherit}
+.feedback-proof .proof-file small{font-size:11px;opacity:.9}
+.proof-file{display:grid;gap:2px;min-width:0}.proof-file strong{overflow:hidden;text-overflow:ellipsis;font-weight:600;white-space:nowrap}.proof-file small{opacity:.7}
+.proof-avatar{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:50%;background:var(--brand-ink);color:var(--brand);font-family:var(--f-ui);font-weight:700}
+.decision-pill,.proof-state{margin-left:auto;padding:4px 7px;border-radius:var(--r-full);background:color-mix(in srgb,var(--brand-ink) 15%,transparent);
+  font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.decision-pill.is-approved{background:var(--brand-ink);color:var(--brand)}
+.feedback-detail{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:196px;min-height:40px;padding:8px 10px;
+  border:1px solid color-mix(in srgb,var(--brand-ink) 22%,transparent);border-radius:var(--r-md);
+  background:color-mix(in srgb,var(--brand-ink) 9%,transparent);font-family:var(--f-mono);font-size:10px;color:var(--brand-ink)}
+.pf-row{padding:5px 7px;border-radius:var(--r-full);background:color-mix(in srgb,var(--brand-ink) 8%,transparent);white-space:nowrap}
+.pf-row::before{content:"·";margin-right:3px}.pf-row.tick::before{content:"✓"}
+.js .pf-row{opacity:.42;transform:translateY(2px)}
+.pf-row.tick{background:color-mix(in srgb,var(--brand-ink) 16%,transparent);color:var(--brand-ink);opacity:1;transform:none;
+  transition:opacity 240ms var(--ease-out),transform 240ms var(--ease-out),background-color 240ms var(--ease-out)}
+.receipt-proof{display:grid;gap:3px;min-width:206px}
+.receipt-line{display:block;overflow:hidden;white-space:nowrap;color:var(--brand-ink);opacity:1;max-width:230px;font-size:11px}
+.js .receipt-line{opacity:0;max-width:0}
+.receipt-line.on{opacity:1;max-width:230px;transition:opacity 320ms var(--ease),max-width 760ms steps(24,end)}
+.receipt-meta{font-size:11px;opacity:.9}
+.handoff-proof{min-width:228px}.handoff-proof .proof-file{flex:1}
+
+/* One clearly identifiable creative carries through the entire sequence. */
+.creative{position:absolute;top:78px;right:calc(10% - 49px);width:98px;height:128px;z-index:5;opacity:1}
+.js .creative{left:0;right:auto;transform:translate3d(0,0,0);will-change:transform,opacity,filter}
+.js .creative.is-hidden{opacity:0}
+.creative-card{position:absolute;inset:0;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-lg);
+  box-shadow:0 16px 34px rgba(34,29,25,.16),0 2px 5px rgba(34,29,25,.08);display:flex;flex-direction:column;gap:var(--s-15);padding:var(--s-15);overflow:visible;
+  transform:translateY(-8px) scale(.84);transition:box-shadow 240ms var(--ease-out),transform 360ms var(--ease-out)}
+.creative.is-moving .creative-card{box-shadow:0 20px 42px rgba(34,29,25,.17)}
+.creative.is-docked .creative-card{transform:translateY(0) scale(.72);box-shadow:0 10px 24px rgba(34,29,25,.14)}
+.creative .thumb{flex:1;min-height:0;border-radius:var(--r-md);overflow:hidden;background:var(--surface-sunk)}
+.creative .thumb img{width:100%;height:100%;object-fit:cover}
+.creative .cap{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-mono);
+  font-size:10px;color:var(--ink-3);letter-spacing:-.01em;line-height:1.2}
+.creative-version{position:absolute;right:9px;top:9px;display:grid;place-items:center;min-width:28px;height:22px;padding-inline:6px;
+  border:1px solid rgba(255,255,255,.7);border-radius:var(--r-full);background:rgba(255,255,255,.86);color:#221D19;
+  font-family:var(--f-mono);font-size:11px;font-weight:600;box-shadow:var(--shadow-1)}
+.creative .ring{position:absolute;inset:-6px;border-radius:calc(var(--r-lg) + 3px);pointer-events:none;opacity:0}
+.creative .ring.brand{border:2px solid var(--brand)}
+.creative .ring.warn{border:2px solid var(--warn)}
+.creative .ring.ok{border:2px solid var(--ok)}
+.creative .ring.on{opacity:1;animation:ring-arrive 620ms var(--ease-out) both}
+@keyframes ring-arrive{0%{opacity:0;transform:scale(.96)}55%{opacity:1;transform:scale(1.025)}100%{opacity:1;transform:scale(1)}}
+
+/* The creative is the endpoint. This invisible anchor only aligns its verified readback. */
+.slot{--slot-edge:color-mix(in srgb,var(--brand) 38%,var(--line-strong));position:absolute;right:calc(10% - 75px);top:58px;width:150px;height:132px;z-index:1;
+  border:0 solid var(--slot-edge);pointer-events:none;overflow:visible}
+.js .slot{right:auto;left:0}
+.slot.is-receiving{--slot-edge:var(--brand)}
+.slot.readback{--slot-edge:var(--ok)}
+
+/* Controls float in the visual's top rail but stay outside aria-hidden content. */
+.conveyor-controls{position:absolute;left:20px;right:20px;top:-10px;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:var(--s-4);pointer-events:none}
+.conveyor-actions{display:flex;align-items:center;justify-content:flex-end;gap:var(--s-2);pointer-events:auto}
+.conveyor-control{min-height:44px;padding:var(--s-2) var(--s-3);border:1px solid var(--line);border-radius:var(--r-full);
+  background:var(--surface-2);box-shadow:var(--shadow-1);font-family:var(--f-mono);font-size:11px;color:var(--ink-2);
+  transition:color var(--dur-fast) var(--ease),background-color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.conveyor-control:hover{color:var(--brand);border-color:var(--brand);background:var(--brand-faint)}
+.conveyor-control:active{transform:scale(.96)}
+.conveyor-control[hidden]{display:none!important}
+.conveyor-control[disabled]{color:var(--decor);cursor:not-allowed;transform:none}
+#conveyorReplay.is-handoff{color:var(--ink-3);cursor:wait}
+html:not(.js) .station-feedback:not(:last-child){display:none}
+html:not(.js) .station-node{border-color:var(--ok);background:var(--ok)}
+html:not(.js) .station-node::before{opacity:0}
+html:not(.js) .station-node::after{content:"✓";position:absolute;inset:-2px;display:grid;place-items:center;color:var(--on-fill);font-size:12px;font-weight:750}
+html:not(.js) .track-segment::after{transform:scaleX(1);background:var(--ok)}
+html:not(.js) .slot{--slot-edge:var(--ok)}
+html:not(.js) .creative-card{transform:translateY(0) scale(.72)}
+
+/* run-line (page spine) */
+.run-line{position:fixed;left:max(var(--s-4),env(safe-area-inset-left));top:64px;bottom:0;width:2px;z-index:30;pointer-events:none}
+.run-line-track{position:absolute;inset:0;background:var(--line);border-radius:var(--r-full)}
+.run-line-fill{position:absolute;inset:0;background:var(--brand);transform-origin:top center;transform:scaleY(1);
+  border-radius:var(--r-full);transition:background-color var(--dur-slow) var(--ease)}
+.js .run-line-fill{transform:scaleY(0)}
+.run-line[data-tone="ok"] .run-line-fill{background:var(--ok)}
+.run-line[data-tone="warn"] .run-line-fill{background:var(--warn)}
+.run-line[data-tone="held"] .run-line-fill{background:var(--held)}
+@media(max-width:1023px){
+  .run-line{left:0;right:0;top:auto;height:2px;bottom:auto;top:64px;width:auto}
+  .run-line-track,.run-line-fill{inset:0 auto 0 0;height:100%;width:100%}
+  .run-line-fill{transform-origin:left center}
+  .js .run-line-fill{transform:scaleX(0)}
+  .conveyor-head{grid-template-columns:minmax(0,1fr) auto}
+  .track-context{display:none}
+  .station-label .plate{letter-spacing:.04em}
+  .creative{width:90px;height:118px;top:88px;right:calc(10% - 45px)}
+  .creative-card{transform:translateY(-20px) scale(1)}
+  .slot{width:132px;height:126px;top:62px;right:calc(10% - 66px)}
+  .feedback-lane{inset-inline:20px}
+  .station-feedback{grid-template-columns:58px minmax(0,1fr) auto;gap:var(--s-4);width:min(720px,100%);padding-inline:var(--s-5)}
+  .feedback-step{padding-right:var(--s-4)}
+  .feedback-index{font-size:30px}
+  .feedback-copy strong{font-size:18px}
+  .feedback-proof,.feedback-detail{min-width:168px}
+}
+@media(max-width:1180px) and (min-width:701px){
+  .hero-object-cluster{right:-238px;opacity:.46;transform:translateY(-50%) scale(.82);transform-origin:center right}
+}
+@media(max-width:700px){
+  .hero-intro{min-height:calc(100svh - 64px);padding-block:var(--s-12)}
+  .hero-signal-field::before{background-size:58px 58px;mask-image:linear-gradient(90deg,transparent,rgba(0,0,0,.42) 42%,#000 82%,transparent)}
+  .hero-signal-glow{width:92vw;height:64%;right:-30%;top:7%;opacity:.62}
+  .hero-object-cluster{right:-170px;top:46%;visibility:hidden;opacity:0;transform:translateY(-50%) scale(.62);transform-origin:center right}
+  .played .hero-relay-pulse{animation:none}
+  .conveyor-zone{margin-top:var(--s-12)}
+  .conveyor-head{grid-template-columns:1fr;gap:var(--s-4)}
+  .conveyor-head .sample-band{justify-self:start}
+  .conveyor-title{font-size:30px;line-height:1.08}
+  .conveyor-lede{font-size:15px}
+  .track-wrap{margin-top:var(--s-6)}
+  .track{height:520px;border-radius:var(--r-lg)}
+  .track::before{width:150px;height:150px;top:80px}
+  .track-line{left:calc(10% + 26px);right:calc(10% + 26px);top:200px}
+  .stations{padding-inline:36px}
+  .station-node{margin-top:190px}
+  .creative{width:72px;height:98px;top:92px;right:calc(10% + 26px - 36px)}
+  .slot{width:104px;height:112px;top:66px;right:calc(10% + 26px - 52px)}
+  .station-tag{display:none}
+  .station-label{top:224px;min-height:20px}
+  .station-label .plate{font-size:11px;font-weight:600;letter-spacing:-.015em;text-transform:none}
+  .js .station-label{opacity:0;transform:translateY(3px);transition:opacity 240ms var(--ease-out),transform 320ms var(--ease-out)}
+  .js .station.is-active .station-label{opacity:1;transform:none}
+  html:not(.js) .station:not(:last-child) .station-label{display:none}
+  .feedback-lane{inset:268px 12px 14px}
+  .station-feedback{grid-template-columns:1fr;align-content:center;align-items:start;gap:var(--s-3);width:100%;min-height:224px;padding:var(--s-4);border-radius:var(--r-md)}
+  .feedback-step{align-self:auto;display:flex;align-items:baseline;gap:var(--s-2);padding:0;border-right:0}
+  .feedback-index{font-size:24px}.feedback-step-label{margin:0}
+  .feedback-copy strong{font-size:18px}.feedback-copy small{font-size:13px}
+  .feedback-proof,.feedback-detail{justify-content:flex-start;width:100%;min-width:0}
+  .feedback-detail{min-height:42px;flex-wrap:wrap}
+  .receipt-proof,.handoff-proof{min-width:0}
+  .conveyor-controls{left:12px;right:12px;top:-10px;gap:6px}
+  .conveyor-actions{gap:4px}
+  .conveyor-control{max-width:none;padding-inline:14px;font-size:11px;line-height:1.2;white-space:nowrap}
+  .conveyor-control span{display:none}
+  #conveyorSkip::after{content:"Skip"}
+  #conveyorReplay::after{content:"Replay ↻"}
+  #conveyorReplay.is-handoff::after{content:"Restarting…"}
+  .creative .cap{font-size:0;text-align:center}
+  .creative .cap::after{content:"v2 exact";font-size:11px}
+}
+@media(max-width:359px){
+  .hero{padding-bottom:48px}
+  .hero-intro{padding-block:32px;min-height:calc(100svh - 64px)}
+  .hero .h1{font-size:32px;line-height:1.06;margin-top:12px}
+  .hero-sub{margin-top:16px;font-size:16px}
+  .cta-row{margin-top:24px;gap:8px}
+  .hero .microcopy{margin-top:24px}
+  .conveyor-zone{margin-top:32px}
+  .track{height:560px}
+  .station-label .plate{font-size:11px;letter-spacing:0}
+  .creative{right:calc(10% + 26px - 34px);width:68px;height:94px;top:94px}
+  .slot{right:calc(10% + 26px - 50px);width:100px;height:110px;top:68px}
+  html:not(.js) .slot{right:calc(10% + 26px - 50px)}
+  .feedback-lane{inset:278px 10px 14px}
+  .station-feedback{padding:14px}
+}
+
+/* ---------- sections ---------- */
+.section{padding-block:var(--s-16)}
+@media(min-width:1024px){.section{padding-block:var(--s-20)}}
+.sec-head{max-width:640px}
+h2{font-family:var(--f-display);font-weight:700;font-variation-settings:'wdth' 112;font-size:clamp(28px,3.6vw,42px);line-height:1.12;letter-spacing:-.005em}
+.sec-lede{margin-top:var(--s-4);color:var(--ink-2);font-size:16px;max-width:62ch}
+
+/* Product-first feature stage */
+.product-stage{margin-top:var(--s-10)}
+.feature-tabs,.audience-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+.feature-tab,.audience-tab{position:relative;min-height:48px;padding:var(--s-2) var(--s-3);border:0;border-bottom:2px solid transparent;border-radius:0;
+  color:var(--ink-3);font-size:14px;font-weight:600;text-align:left;
+  transition:background-color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.feature-tab:hover,.audience-tab:hover{color:var(--ink);background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--brand-faint) 42%,transparent))}
+.feature-tab:active,.audience-tab:active{transform:scale(.985)}
+.feature-tab[aria-selected="true"],.audience-tab[aria-selected="true"]{color:var(--brand);background:transparent;border-bottom-color:var(--brand);box-shadow:none}
+.feature-panel{margin-top:0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none;padding:clamp(28px,4vw,48px) 0;scroll-margin-top:96px;overflow:hidden}
+.feature-panel[hidden],.audience-panel[hidden]{display:none!important}
+.feature-layout{display:grid;grid-template-columns:minmax(220px,.62fr) minmax(0,1.38fr);gap:clamp(28px,5vw,64px);align-items:center}
+.feature-copy .plate{color:var(--brand)}
+.feature-copy h3{margin-top:var(--s-3);font-family:var(--f-display);font-size:clamp(24px,3vw,36px);line-height:1.12}
+.feature-copy p{margin-top:var(--s-4);color:var(--ink-2);font-size:15px;max-width:38ch}
+.feature-point{margin-top:var(--s-5);display:flex;align-items:center;gap:var(--s-2);font-size:13px;font-weight:600;color:var(--ink-2)}
+.feature-point::before{content:"✓";display:grid;place-items:center;width:20px;height:20px;flex:0 0 20px;border-radius:var(--r-full);background:var(--ok-soft);color:var(--ok);font-size:11px}
+.demo-window{min-width:0;min-height:390px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2);box-shadow:0 18px 46px rgba(43,36,29,.1);overflow:hidden}
+.demo-topbar{min-height:52px;padding:var(--s-2) var(--s-4);display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);border-bottom:1px solid var(--line);background:var(--surface)}
+.demo-title{display:flex;align-items:center;gap:var(--s-2);min-width:0;font-size:13px;font-weight:600}
+.demo-title::before{content:"";width:8px;height:8px;border-radius:var(--r-full);background:var(--brand);box-shadow:0 0 0 4px var(--brand-faint)}
+.demo-title span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.demo-sample{flex:none;display:inline-flex;align-items:center;gap:7px;padding:0;border-radius:0;background:transparent;color:var(--ink-3);font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.demo-sample::before{content:"";width:16px;height:1px;background:var(--warn)}
+.proof-grid{display:grid;grid-template-columns:minmax(132px,.72fr) minmax(210px,1.28fr);gap:var(--s-5);padding:var(--s-5)}
+.proof-creative{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);padding:var(--s-2);align-self:start}
+.proof-creative img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:var(--r-sm)}
+.proof-file{margin-top:var(--s-2);font-family:var(--f-mono);font-size:11px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-stack{display:grid;gap:var(--s-2)}
+.task-row{min-height:54px;display:flex;align-items:center;gap:var(--s-3);padding:10px var(--s-3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)}
+.task-icon{width:24px;height:24px;display:grid;place-items:center;flex:none;border-radius:var(--r-full);font-family:var(--f-mono);font-size:11px;font-weight:600}
+.task-icon.ok{color:var(--ok);background:var(--ok-soft)}.task-icon.warn{color:var(--warn);background:var(--warn-soft)}
+.task-copy{min-width:0;display:grid;gap:2px}.task-copy strong{font-size:13px}.task-copy small{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.task-state{margin-left:auto;flex:none;font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.proof-ready{margin-top:var(--s-3);display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);font-size:12px;color:var(--ink-3)}
+
+.decision-demo{display:grid;grid-template-columns:minmax(170px,.78fr) minmax(190px,1.22fr);gap:var(--s-5);padding:var(--s-5);align-items:center}
+.approval-device{max-width:230px;margin-inline:auto;border:1px solid var(--line-strong);border-radius:18px;background:var(--surface);padding:var(--s-2);box-shadow:var(--shadow-2)}
+.approval-device img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:12px}
+.approval-name{padding:10px var(--s-1) var(--s-1);display:flex;align-items:center;justify-content:space-between;gap:var(--s-2)}
+.approval-name strong{font-size:12px}.approval-name span{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.decision-actions{display:grid;gap:var(--s-2);margin-top:var(--s-2)}
+.decision-action{min-height:44px;padding:var(--s-2) var(--s-3);border:1px solid var(--line-strong);border-radius:var(--r-sm);font-size:12px;font-weight:600;text-align:left;background:var(--surface-2);
+  transition:background-color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.decision-action:hover{border-color:var(--brand);background:var(--brand-faint)}.decision-action:active{transform:scale(.98)}
+.decision-action[aria-pressed="true"]{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.decision-result{min-height:230px;display:flex;flex-direction:column;justify-content:center;padding:var(--s-6);border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.decision-result .result-mark{width:40px;height:40px;display:grid;place-items:center;border-radius:var(--r-full);background:var(--ok-soft);color:var(--ok);font-size:18px}
+.decision-result h4{margin-top:var(--s-4);font-size:18px}.decision-result p{margin-top:var(--s-2);font-size:13px;color:var(--ink-2)}
+.result-receipt{margin-top:var(--s-4);padding-top:var(--s-3);border-top:1px solid var(--line);font-family:var(--f-mono);font-size:11px;color:var(--ink-3);overflow-wrap:anywhere}
+
+.record-grid{display:grid;grid-template-columns:minmax(230px,1.2fr) minmax(160px,.8fr);gap:var(--s-4);padding:var(--s-5)}
+.record-list{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.record-head,.record-row{display:grid;grid-template-columns:56px minmax(0,1fr) 64px;gap:var(--s-2);align-items:center;padding:10px var(--s-3)}
+.record-head{background:var(--surface-sunk);font-family:var(--f-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.03em}
+.record-row{min-height:60px;border-top:1px solid var(--line);font-size:12px}.record-row:first-of-type{border-top:0}
+.record-version{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.record-decision{display:grid;gap:2px}.record-decision small{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.handoff-card{display:flex;flex-direction:column;justify-content:space-between;gap:var(--s-4);padding:var(--s-5);border:1px solid var(--held);border-radius:var(--r-md);background:var(--held-soft)}
+.handoff-card .eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;color:var(--held);text-transform:uppercase}
+.handoff-card h4{margin-top:var(--s-2);font-size:16px;overflow-wrap:anywhere}.handoff-card p{margin-top:var(--s-2);font-size:12px;color:var(--ink-2)}
+.handoff-status{display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);font-family:var(--f-mono);font-size:11px;color:var(--held)}
+
+/* Publish checkpoint — varied creative enters; spend authority stays outside. */
+.control-band{position:relative;isolation:isolate;overflow:hidden;background:#10162A;color:#F7F8FD;border-block:1px solid rgba(255,255,255,.09)}
+.control-band::before{content:"";position:absolute;z-index:-1;width:720px;height:720px;right:0;top:-330px;border-radius:50%;
+  background:radial-gradient(circle at 72% 50%,rgba(75,102,255,.24),rgba(75,102,255,0) 68%);pointer-events:none}
+.control-band .wrap{position:relative;z-index:1}
+.control-head{max-width:920px}
+.control-head .plate{color:#9EADFF}
+.control-head h2{max-width:19ch;color:#FFFFFF;font-size:clamp(32px,4.2vw,54px);font-weight:760;font-variation-settings:'wdth' 118;letter-spacing:-.025em;text-wrap:balance}
+.control-head .sec-lede{max-width:76ch;color:#BDC5D8;font-size:17px;text-wrap:pretty}
+.control-theatre{position:relative;margin-top:var(--s-10);display:grid;grid-template-columns:minmax(0,1.42fr) minmax(340px,.78fr);gap:var(--s-4);
+  padding:var(--s-4);border:1px solid rgba(255,255,255,.12);border-radius:26px;background:rgba(255,255,255,.055);
+  box-shadow:0 34px 90px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(18px) saturate(120%)}
+.control-gallery{min-width:0;display:grid;grid-template-rows:auto 1fr auto;padding:var(--s-5);border:1px solid rgba(255,255,255,.1);
+  border-radius:18px;background:#0B1020;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.control-gallery-head,.control-console-head{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3)}
+.control-gallery-title,.control-console-title{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.control-gallery-title{color:#C7CFE3}
+.control-gallery-count{display:inline-flex;align-items:center;min-height:28px;padding:var(--s-1) var(--s-2);border:1px solid rgba(255,255,255,.13);
+  border-radius:var(--r-full);color:#AEB8D2;font-family:var(--f-mono);font-size:11px;white-space:nowrap}
+.creative-mosaic{height:416px;margin-top:var(--s-4);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:10px}
+.format-card{position:relative;display:block;min-width:0;min-height:0;width:100%;height:100%;padding:0;overflow:hidden;text-align:left;color:#FFFFFF;
+  border:1px solid rgba(255,255,255,.16);border-radius:14px;background:#202945;box-shadow:0 14px 30px rgba(0,0,0,.25);
+  transform-origin:center;will-change:transform,opacity;
+  transition:transform 260ms var(--ease-out),border-color 180ms var(--ease),box-shadow 260ms var(--ease-out)}
+.format-card::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(5,8,17,.8),rgba(5,8,17,0) 54%);pointer-events:none}
+.format-card img{width:100%;height:100%;object-fit:cover;transition:transform 620ms var(--ease-out),filter 320ms var(--ease)}
+.format-card:nth-child(1){grid-column:1/3;grid-row:1/3}
+.format-card:nth-child(2){grid-column:3/5;grid-row:1}
+.format-card:nth-child(3){grid-column:5/7;grid-row:1}
+.format-card:nth-child(4){grid-column:3/4;grid-row:2}
+.format-card:nth-child(5){grid-column:4/7;grid-row:2}
+.format-card:not(:disabled):hover{z-index:2;transform:translateY(-4px) scale(1.012);border-color:rgba(158,173,255,.72);box-shadow:0 22px 44px rgba(0,0,0,.36)}
+.format-card:not(:disabled):hover img{transform:scale(1.035);filter:saturate(1.04)}
+.format-card:not(:disabled):active{transform:translateY(-1px) scale(.985);transition-duration:90ms}
+.format-card:focus-visible{z-index:3;outline:2px solid #9EADFF;outline-offset:3px}
+.format-card[aria-pressed="true"]{z-index:1;border-color:#9EADFF;box-shadow:0 0 0 2px rgba(158,173,255,.3),0 20px 42px rgba(0,0,0,.34)}
+.format-card[aria-pressed="true"] img{transform:scale(1.018);filter:saturate(1.04)}
+.format-card:disabled{cursor:default}
+.format-meta{position:absolute;z-index:1;left:10px;right:10px;bottom:10px;display:flex;align-items:end;justify-content:space-between;gap:var(--s-2);color:#FFFFFF}
+.format-name{display:grid;gap:1px;min-width:0}.format-name strong{font-size:12px;line-height:1.2}.format-name small{font-family:var(--f-mono);font-size:11px;color:#CED5E8;letter-spacing:.025em;text-transform:uppercase}
+.format-shape{position:absolute;z-index:2;right:10px;top:10px;padding:3px 6px;border:1px solid rgba(255,255,255,.32);border-radius:var(--r-full);background:rgba(7,10,20,.58);
+  backdrop-filter:blur(8px);color:#FFFFFF;font-family:var(--f-mono);font-size:10px;letter-spacing:.04em}
+.format-selected{position:absolute;z-index:2;left:10px;top:10px;display:inline-flex;align-items:center;gap:5px;min-height:25px;padding:3px 7px;
+  border:1px solid rgba(255,255,255,.38);border-radius:var(--r-full);background:rgba(44,70,216,.9);color:#FFFFFF;font-family:var(--f-mono);font-size:10px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;opacity:0;transform:translateY(-3px) scale(.96);transition:opacity 180ms var(--ease),transform 260ms var(--ease-out)}
+.format-selected::before{content:"✓";font-size:11px}.format-card[aria-pressed="true"] .format-selected{opacity:1;transform:none}
+.gallery-foot{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s-4);margin-top:var(--s-4);color:#9FA9C1;font-size:11px;line-height:1.45}
+.gallery-foot strong{color:#E7EAF4;font-weight:600}
+
+.control-console{position:relative;min-width:0;padding:var(--s-6);border-radius:3px;background:#F5F6FB;color:#151B2D;
+  box-shadow:0 26px 64px rgba(0,0,0,.3);overflow:hidden}
+.control-console::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#5269EF}
+.control-console-title{color:#626B82}
+.control-console-sample{display:inline-flex;align-items:center;gap:7px;padding:0;border-radius:0;background:transparent;color:#626B82;font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+.control-console-sample::before{content:"";width:14px;height:1px;background:#5269EF}
+.publish-readback{margin-top:var(--s-5);padding:var(--s-4) 0;border:0;border-block:1px solid #D8DCE8;border-radius:0;background:transparent;box-shadow:none}
+.publish-state{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);font-size:12px;color:#536078}
+.publish-state>span:first-child{display:flex;align-items:center;gap:var(--s-2)}
+.publish-state>span:first-child::before{content:"";width:8px;height:8px;border-radius:50%;background:#35804F;box-shadow:0 0 0 4px #DFEDE2}
+.publish-state strong{position:relative;padding:2px 0 3px 14px;border:0;border-bottom:1px solid #B8AA99;border-radius:0;background:transparent;color:#6B5E51;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em}
+.publish-state strong::before{content:"";position:absolute;left:1px;top:7px;width:6px;height:6px;border-radius:1px;background:#6B5E51}
+.publish-selection{display:grid;gap:2px;margin-top:var(--s-4);padding-left:var(--s-3);border-left:2px solid #5269EF}
+.publish-selection span{color:#667187;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.publish-selection strong{font-size:13px;line-height:1.25;color:#20273A;overflow-wrap:anywhere}
+.publish-readback h3{margin-top:var(--s-3);font-family:var(--f-display);font-size:21px;line-height:1.12;letter-spacing:-.015em;overflow-wrap:anywhere}
+.publish-id{display:block;margin-top:var(--s-15);color:#59647A;font-family:var(--f-mono);font-size:11px;overflow-wrap:anywhere}
+.control-sequence{list-style:none;margin-top:var(--s-4);display:grid;gap:0;border-bottom:1px solid #D8DCE8}
+.control-sequence li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:center;min-height:58px;padding:10px 0;border:0;border-top:1px solid #D8DCE8;border-radius:0;background:transparent}
+.sequence-mark{display:grid;place-items:center;width:22px;height:22px;border:1px solid #A9C8B3;border-radius:4px;background:transparent;color:#2C6A43;font-family:var(--f-mono);font-size:10px;font-weight:700}
+.control-sequence li.is-yours{border-color:#BFC8FA;background:linear-gradient(90deg,rgba(82,105,239,.09),transparent 82%)}.control-sequence li.is-yours .sequence-mark{border-color:#2C46D8;background:#2C46D8;color:#FFFFFF}
+.sequence-copy{min-width:0;display:grid;gap:1px}.sequence-copy strong{font-size:12px}.sequence-copy small{color:#566177;font-size:11px;line-height:1.35}
+.activation-guard{margin-top:var(--s-5);padding:var(--s-4);border:0;border-left:2px solid #5269EF;border-radius:0;background:linear-gradient(90deg,#E7EAF4,rgba(231,234,244,.36));box-shadow:none}
+.guard-kicker{display:flex;align-items:center;justify-content:space-between;gap:var(--s-2);font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#59647A}
+.guard-kicker span:last-child{color:#2C46D8}
+.activation-lock{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s-3);align-items:center;margin-top:var(--s-3)}
+.activation-copy{display:grid;gap:2px;min-width:0}.activation-copy strong{font-size:13px}.activation-copy small{color:#566177;font-size:11px;line-height:1.4}
+.activation-action{width:100%;min-height:44px;display:inline-flex;align-items:center;justify-content:space-between;gap:var(--s-2);padding:var(--s-2) var(--s-3);border:1px solid #AEB9F5;
+  border-radius:10px;background:#FFFFFF;color:#2C46D8;box-shadow:0 5px 14px rgba(44,70,216,.1);font-size:11px;font-weight:680;text-align:left;
+  transition:transform 120ms var(--ease),border-color 160ms var(--ease),background-color 160ms var(--ease),box-shadow 220ms var(--ease-out)}
+.activation-action:hover{border-color:#8091F4;background:#F8F9FF;box-shadow:0 9px 22px rgba(44,70,216,.15)}
+.activation-action:active{transform:scale(.985)}
+.activation-action[aria-expanded="true"]{border-color:#8091F4;background:#F1F3FF;box-shadow:inset 0 0 0 1px rgba(44,70,216,.06)}
+.activation-action-icon{font-family:var(--f-mono);font-size:13px;transition:transform 220ms var(--ease-out)}
+.activation-action[aria-expanded="true"] .activation-action-icon{transform:rotate(45deg)}
+.activation-fallback{display:inline-flex;align-items:center;min-height:44px;padding:var(--s-2) var(--s-3);border:1px solid #C9D0E5;border-radius:10px;background:#F5F6FB;color:#59647A;font-size:11px}
+.js .activation-fallback{display:none}
+html:not(.js) .activation-action{display:none}
+.handoff-preview{margin-top:var(--s-3);padding:var(--s-3);border:1px solid #C7CEEF;border-radius:11px;background:#FFFFFF;box-shadow:0 10px 24px rgba(24,31,54,.08);transform-origin:top right}
+.handoff-preview[hidden]{display:none}
+.handoff-preview-kicker{display:block;color:#2C46D8;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+.handoff-preview strong{display:block;margin-top:5px;font-size:12px;color:#20273A;overflow-wrap:anywhere}
+.handoff-preview p{margin-top:4px;color:#59647A;font-size:11px;line-height:1.45}
+.handoff-route{display:flex;align-items:center;gap:6px;margin-top:10px;color:#69748B;font-family:var(--f-mono);font-size:10px}
+.handoff-route span{padding:3px 6px;border:1px solid #D7DCEB;border-radius:var(--r-full);background:#F5F6FB}.handoff-route b{color:#2C46D8}
+.control-limit{margin-top:var(--s-4);padding-top:var(--s-4);border-top:1px solid #D6DBE7;color:#606A80;font-size:11px;line-height:1.5}
+.control-limit strong{color:#20273A}
+.js .control-theatre.reveal:not(.in) .format-card,.js .control-theatre.reveal:not(.in) .control-sequence li,.js .control-theatre.reveal:not(.in) .activation-guard{opacity:0}
+.control-theatre.reveal.in .format-card,.control-theatre.reveal.in .control-sequence li,.control-theatre.reveal.in .activation-guard{
+  animation:control-arrive 620ms var(--ease-out) backwards;animation-delay:var(--enter-delay,0ms)}
+.control-theatre.reveal.in .format-card:nth-child(1){--enter-delay:80ms}.control-theatre.reveal.in .format-card:nth-child(2){--enter-delay:150ms}
+.control-theatre.reveal.in .format-card:nth-child(3){--enter-delay:220ms}.control-theatre.reveal.in .format-card:nth-child(4){--enter-delay:290ms}
+.control-theatre.reveal.in .format-card:nth-child(5){--enter-delay:360ms}.control-theatre.reveal.in .control-sequence li:nth-child(1){--enter-delay:260ms}
+.control-theatre.reveal.in .control-sequence li:nth-child(2){--enter-delay:350ms}.control-theatre.reveal.in .control-sequence li:nth-child(3){--enter-delay:440ms}
+.control-theatre.reveal.in .activation-guard{--enter-delay:540ms}
+@keyframes control-arrive{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+
+/* Audience use-case slider */
+.audience-wrap{margin-top:var(--s-8)}
+.audience-stage{position:relative;display:grid;margin-top:var(--s-4);min-height:620px;overflow:hidden;touch-action:pan-y}
+.audience-panel{position:relative;grid-area:1/1;min-height:620px;display:grid;grid-template-columns:.7fr 1.3fr;gap:clamp(28px,4.5vw,58px);align-items:center;
+  padding:clamp(28px,4vw,48px) 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
+.audience-copy .plate{color:var(--brand)}.audience-copy h3{margin-top:var(--s-3);font-size:clamp(24px,3vw,34px);line-height:1.12}
+.audience-copy p{margin-top:var(--s-3);font-size:15px;color:var(--ink-2);max-width:38ch}
+.audience-moment{margin-top:var(--s-5);padding-left:var(--s-3);border-left:2px solid var(--brand);font-size:13px!important;font-weight:600;color:var(--ink)!important}
+.session-frame{min-width:0;overflow:hidden;border:1px solid #BFC8C2;border-radius:7px;background:#E9EEE9;color:#24302C;box-shadow:0 24px 54px rgba(27,39,34,.15)}
+.session-top{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);padding:var(--s-2) var(--s-3);border-bottom:1px solid #CED5D0;background:#F6F8F6}
+.session-title{display:flex;align-items:center;gap:var(--s-2);min-width:0;font-size:12px;font-weight:650}
+.session-lights{display:none}.session-title::before{content:"";width:18px;height:2px;background:#2C46D8}
+.session-label{flex:none;display:inline-flex;align-items:center;gap:7px;padding:0;border:0;border-radius:0;background:transparent;color:#5A6860;font-family:var(--f-mono);font-size:10px;font-weight:650;letter-spacing:.08em;text-transform:uppercase}
+.session-label::before{content:"";width:12px;height:1px;background:#7F8D84}
+.session-canvas{height:474px;display:grid;place-items:center;padding:0;background:
+  radial-gradient(circle at 82% 18%,rgba(44,70,216,.08),transparent 36%),#E8EDE8;overflow:hidden}
+.session-shot{display:block;width:100%;height:100%;object-fit:contain;object-position:center;border-radius:0;box-shadow:none}
+.session-frame--client .session-canvas{background:radial-gradient(circle at 50% 32%,rgba(44,70,216,.12),transparent 45%),#DDE5DF}
+.session-frame--client .session-shot{width:auto;max-width:92%;border:1px solid #C5CEC8;border-radius:5px;box-shadow:0 16px 34px rgba(25,36,31,.14)}
+.session-frame--handoff .session-canvas{height:360px}
+.session-source{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);min-height:38px;padding:var(--s-2) var(--s-3);border-top:1px solid #CED5D0;
+  color:#58665E;font-family:var(--f-mono);font-size:10px;line-height:1.35}
+.session-source strong{color:#32423A;font-weight:600}
+.audience-controls{margin-top:var(--s-3);display:flex;align-items:center;justify-content:space-between;gap:var(--s-4)}
+.audience-count{font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+.slider-buttons{display:flex;gap:var(--s-2)}
+.slider-button{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line-strong);border-radius:var(--r-full);background:var(--surface);
+  transition:background-color var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
+.slider-button:hover{border-color:var(--brand);background:var(--brand-faint)}.slider-button:active{transform:scale(.94)}
+.disqualifier{margin-top:var(--s-5);font-size:13px;color:var(--ink-3);max-width:72ch}
+.decision-result[data-state="change"] .result-mark{background:var(--warn-soft);color:var(--warn)}
+.decision-result[data-state="pass"] .result-mark{background:var(--held-soft);color:var(--held)}
+.decision-action[data-decision="change"][aria-pressed="true"]{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.decision-action[data-decision="pass"][aria-pressed="true"]{border-color:var(--held);color:var(--held);background:var(--held-soft)}
+.demo-stage-button{width:100%;padding-inline:var(--s-3)}
+.handoff-card[data-state="staged"]{border-color:var(--held);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--held) 24%,transparent)}
+.honesty-strip{padding-block:var(--s-5);border-block:1px solid var(--line);background:var(--surface)}
+.honesty-strip p{max-width:820px;font-size:13px;color:var(--ink-2)}
+.honesty-strip strong{color:var(--ink)}
+.audience-panel.is-entering{z-index:2}
+.audience-stage:focus-visible{outline:2px solid var(--brand);outline-offset:4px;border-radius:var(--r-xl)}
+
+html:not(.js) .feature-tabs,html:not(.js) .audience-tabs,html:not(.js) .audience-controls,html:not(.js) .theme-toggle{display:none}
+.js .no-js-only{display:none}
+html:not(.js) .no-js-only{display:inline-flex}
+html:not(.js) #applySubmit{display:none}
+html:not(.js) .feature-panel{margin-top:var(--s-5)}
+html:not(.js) .audience-stage{display:grid;gap:var(--s-5);min-height:0;overflow:visible}
+html:not(.js) .audience-panel{position:static;grid-area:auto;min-height:0}
+html:not(.js) .conveyor-controls{display:none}
+
+@media(max-width:820px){
+  .feature-layout,.audience-panel{grid-template-columns:1fr}
+  .feature-copy p,.audience-copy p{max-width:58ch}
+  .demo-window{min-height:0}
+  .audience-stage,.audience-panel{min-height:800px}
+  .control-theatre{grid-template-columns:minmax(0,1fr)}
+  .creative-mosaic{height:460px}
+}
+@media(max-width:620px){
+  .feature-tabs,.audience-tabs{grid-template-columns:repeat(3,minmax(0,1fr));padding:0;gap:0}
+  .feature-tab,.audience-tab{min-height:44px;padding:var(--s-1) var(--s-15);font-size:12px;text-align:center}
+  .tab-number{display:none}
+  .feature-panel{padding:var(--s-6) 0;border-radius:0}
+  .demo-topbar{flex-direction:column;align-items:flex-start;gap:var(--s-1)}
+  .demo-title{width:100%}.demo-title span{white-space:normal;overflow:visible;text-overflow:clip}
+  .proof-grid,.decision-demo,.record-grid{grid-template-columns:minmax(0,1fr);min-width:0;padding:var(--s-3)}
+  .proof-creative{width:100%;min-width:0;display:grid;grid-template-columns:86px minmax(0,1fr);align-items:center;gap:var(--s-3)}
+  .proof-creative img{width:86px}.proof-file{min-width:0;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.45}
+  .decision-demo>div:first-child{display:grid;grid-template-columns:minmax(0,1fr) 106px;gap:var(--s-3);align-items:start}
+  .approval-device{width:100%;max-width:none;margin:0}.decision-actions{margin-top:0}.decision-action{padding-inline:var(--s-2);font-size:11px;line-height:1.25}
+  .decision-result{min-height:180px;padding:var(--s-4)}
+  .record-head,.record-row{grid-template-columns:56px minmax(0,1fr) 64px;padding-inline:var(--s-2)}
+  .audience-stage,.audience-panel{min-height:790px}
+  .audience-panel{padding:var(--s-6) 0;border-radius:0;align-content:start}
+  .session-canvas{height:390px;padding:0}
+  .session-frame--handoff .session-canvas{height:300px}
+  .session-source{align-items:flex-start;flex-direction:column;gap:2px}
+  .control-head .sec-lede{font-size:15px}
+  .control-theatre{gap:var(--s-2);padding:var(--s-2);border-radius:20px}
+  .control-gallery{padding:var(--s-3);border-radius:14px}
+  .creative-mosaic{height:360px;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:var(--s-2)}
+  .format-card:nth-child(1){grid-column:1/3;grid-row:1/3}
+  .format-card:nth-child(2){grid-column:3/5;grid-row:1}
+  .format-card:nth-child(3){grid-column:3/5;grid-row:2}
+  .format-card:nth-child(4){grid-column:1/2;grid-row:3}
+  .format-card:nth-child(5){grid-column:2/5;grid-row:3}
+  .format-meta{left:var(--s-2);right:var(--s-2);bottom:var(--s-2)}
+  .format-selected{width:25px;justify-content:center;padding-inline:0;font-size:0}
+  .format-name small{display:none}
+  .gallery-foot{display:block}.gallery-foot span:last-child{display:block;margin-top:var(--s-1)}
+  .control-console{padding:var(--s-5);border-radius:3px}
+}
+@media(max-width:359px){
+  .decision-demo>div:first-child{grid-template-columns:minmax(0,1fr) 94px;gap:var(--s-2)}
+  .approval-name strong{font-size:11px}.approval-name span{display:none}
+  .creative-mosaic{height:318px}
+  .control-gallery-head{align-items:flex-start;flex-direction:column;gap:var(--s-2)}
+  .format-name strong{font-size:11px}
+  .format-shape{display:none}
+  .control-console{padding:var(--s-4)}
+  .audience-stage,.audience-panel{min-height:820px}
+  .session-canvas{height:360px;padding:0}
+  .session-label{font-size:9px}
+}
+
+/* apply */
+.form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-2);
+  padding:var(--s-6);max-width:640px}
+@media(min-width:768px){.form-card{padding:var(--s-8)}}
+.field{margin-top:var(--s-5)}
+.field label{display:block;font-weight:600;font-size:14px;margin-bottom:var(--s-15)}
+.field .hint{font-weight:400;color:var(--ink-3);font-size:13px}
+.input,.select,.textarea{width:100%;min-height:44px;padding:var(--s-3);border:1px solid var(--line);border-radius:var(--r-sm);
+  background:var(--surface-2);color:var(--ink);font:inherit;font-size:15px;
+  transition:border-color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),background-color var(--dur-fast) var(--ease)}
+.textarea{min-height:96px;resize:vertical}
+.input:hover,.select:hover,.textarea:hover{border-color:var(--line-strong)}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-faint)}
+.field.invalid .input,.field.invalid .select{border-color:var(--danger);box-shadow:0 0 0 3px var(--danger-soft)}
+.err-msg{display:none;margin-top:var(--s-15);font-size:13px;color:var(--danger)}
+.field.invalid .err-msg{display:block}
+fieldset.invalid .err-msg{display:block}
+.select-wrap{position:relative}
+.select-wrap svg{position:absolute;right:var(--s-3);top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ink-3)}
+fieldset{border:none;margin-top:var(--s-5)}
+legend{font-weight:600;font-size:14px;margin-bottom:var(--s-15)}
+.radio-row{display:flex;gap:var(--s-2);flex-wrap:wrap}
+.radio-pill{position:relative}
+.radio-pill input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.radio-pill span{display:inline-flex;align-items:center;min-height:44px;padding:var(--s-2) var(--s-4);border:1px solid var(--line-strong);
+  border-radius:var(--r-full);font-size:14px;font-weight:500;
+  transition:border-color var(--dur-fast) var(--ease),background-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
+.radio-pill input:checked + span{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.radio-pill input:focus-visible + span{outline:2px solid var(--brand);outline-offset:2px}
+.form-footnote{margin-top:var(--s-4);font-size:13px;color:var(--ink-3)}
+.form-footnote .tlink{display:inline-flex;align-items:center;min-height:44px}
+#applySubmit{width:100%;margin-top:var(--s-6)}
+.sample-band{display:inline-flex;align-items:center;gap:8px;padding:0;border:0;border-radius:0;background:transparent;color:var(--ink-3);font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.sample-band::before{content:"";width:18px;height:1px;background:var(--warn)}
+
+/* receipt spine strip */
+.spine-strip{margin-top:var(--s-10);border:1px dashed var(--line-strong);border-radius:var(--r-md);padding:var(--s-4);
+  font-family:var(--f-mono);font-size:12px;color:var(--ink-3);display:flex;gap:var(--s-4);flex-wrap:wrap}
+.spine-strip .awaiting{color:var(--warn);font-weight:600}
+.js .spine-strip span{opacity:0;transform:translateY(4px)}
+.spine-strip span.lit{opacity:1;transform:none;transition:opacity var(--dur-slow) var(--ease),transform var(--dur-slow) var(--ease)}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding-block:var(--s-10);margin-top:var(--s-16)}
+.footer-inner{display:flex;flex-wrap:wrap;gap:var(--s-4);align-items:center;justify-content:space-between}
+.footer-links{display:flex;gap:var(--s-6);align-items:center;flex-wrap:wrap}
+.footer-links .tlink{display:inline-flex;align-items:center;min-height:44px}
+
+/* scroll reveals — initial hidden state only under .js */
+.js .reveal{opacity:0;transform:translateY(10px)}
+.reveal.in{opacity:1;transform:none;transition:opacity var(--dur-slow) var(--ease-out),transform var(--dur-slow) var(--ease-out)}
+
+@media(prefers-reduced-transparency:reduce){
+  .nav{background:var(--paper);backdrop-filter:none}
+  .control-theatre{background:#171E36;backdrop-filter:none}
+  .format-shape{background:#090D1A;backdrop-filter:none}
+}
+@media(prefers-contrast:more){
+  :focus-visible{outline-width:3px}
+}
+
+/* reduced motion — coherent resolved static Conveyor */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0ms!important}
+  .rise,.reveal,.pf-row,.receipt-line,.station,.format-card,.control-sequence li,.activation-guard{opacity:1!important;transform:none!important}
+  .track-segment::after{transform:scaleX(1)!important}
+  .run-line-fill{transform:scaleY(1)!important}
+  .creative{transition:none!important}
+  .feedback-detail .pf-row{color:var(--ok)!important;opacity:1!important;transform:none!important}
+  .receipt-line{opacity:1!important;max-width:260px!important}
+  .station-feedback{transition:none!important}
+  .conveyor-control{display:none!important}
+  .hero-signal-field{transform:translate3d(-50%,0,0)!important;opacity:1!important}
+  .hero-signal-field::before,.hero-signal-glow{opacity:1!important;transform:none!important}
+  .hero-signal-field::after{display:none!important}
+  .hero-orbit{opacity:.72!important}.hero-cluster-label,.hero-file-tile,.hero-signal-card{opacity:1!important}
+  .hero-relay-progress{stroke-dashoffset:0!important}
+  .hero-relay-pulse{display:none!important}
+  .btn-primary:hover,.theme-toggle:hover svg{transform:none}
+}
+@media(prefers-reduced-motion:reduce) and (max-width:1023px){
+  .run-line-fill{transform:scaleX(1)!important}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="run-line" data-tone="brand" aria-hidden="true"><div class="run-line-track"></div><div class="run-line-fill" id="runFill"></div></div>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="wordmark" href="#top">Senditor<span class="plate">Pilot</span></a>
+    <div class="nav-spacer"></div>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <a class="btn btn-primary" href="#apply">Apply for the pilot</a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<section class="hero wrap" id="top" aria-labelledby="hero-h">
+  <div class="hero-intro" id="heroIntro">
+    <div class="hero-signal-field" aria-hidden="true">
+      <div class="hero-signal-glow"></div>
+      <div class="hero-object-cluster">
+        <svg class="hero-relay" viewBox="0 0 510 480" preserveAspectRatio="none" focusable="false">
+          <defs>
+            <linearGradient id="heroRelayApproval" x1="232" y1="184" x2="278" y2="143" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#5269EF"/><stop offset="1" stop-color="#35804F"/>
+            </linearGradient>
+            <linearGradient id="heroRelayMeta" x1="390" y1="195" x2="390" y2="254" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#35804F"/><stop offset="1" stop-color="#5269EF"/>
+            </linearGradient>
+          </defs>
+          <path class="hero-relay-base" d="M232 184C251 184 253 143 278 143"/>
+          <path class="hero-relay-progress hero-relay-progress--approval" pathLength="1" d="M232 184C251 184 253 143 278 143"/>
+          <path class="hero-relay-base" d="M390 195V254"/>
+          <path class="hero-relay-progress hero-relay-progress--meta" pathLength="1" d="M390 195V254"/>
+        </svg>
+        <span class="hero-relay-pulse hero-relay-pulse--approval"></span>
+        <span class="hero-relay-pulse hero-relay-pulse--meta"></span>
+        <span class="hero-orbit one"></span><span class="hero-orbit two"></span>
+        <span class="hero-cluster-label">Exact file · illustrative handoff</span>
+        <figure class="hero-file-tile">
+          <div class="hero-file-top"><span>Approved creative</span><span class="hero-file-version">v2 · locked</span></div>
+          <img src="assets/spring-launch-v2.webp" width="480" height="600" alt="" decoding="async" fetchpriority="high">
+          <figcaption class="hero-file-foot"><span class="hero-file-name"><strong>Spring launch</strong><small>spring-launch-v2.png</small></span><span class="hero-file-lock">✓</span></figcaption>
+        </figure>
+        <div class="hero-signal-card hero-signal-card--approval">
+          <div class="hero-signal-card-head"><span class="hero-signal-card-kicker">Client receipt</span><span class="hero-signal-check">✓</span></div>
+          <strong>Approved by Maya</strong><small>Exact version · 14:02 · receipt r-7f3c</small>
+        </div>
+        <div class="hero-signal-card hero-signal-card--meta">
+          <div class="hero-signal-card-head"><span class="hero-signal-card-kicker">Meta readback</span><span class="hero-paused-chip">PAUSED</span></div>
+          <strong>Created. Spend stays off.</strong><small>Use the returned ad ID to find it in Ads Manager.</small>
+        </div>
+      </div>
+    </div>
+    <div class="hero-copy">
+      <p class="plate rise d1">Client sign-off for paid Meta ads</p>
+      <h1 class="h1 rise d2" id="hero-h">Client approval that ends with the right ad — still <span style="white-space:nowrap">PAUSED</span>.</h1>
+      <p class="hero-sub rise d3">A focused, operator-run pilot for Meta ad teams: check the creative, capture the client’s answer against the exact version, then test publishing that same file into the chosen ad set as <strong>PAUSED</strong>. Budget, audience, bid, and activation stay with you.</p>
+      <div class="cta-row rise d4">
+        <a class="btn btn-primary" href="#apply">Apply for the pilot</a>
+        <a class="btn btn-ghost" href="#path">Watch a decision become a receipt</a>
+      </div>
+      <p class="microcopy rise d4">Pilot terms are set with each early operator · run by us, on our machine · <span class="mono">generation costs itemised at cost</span>. Meta is the only connector in this pilot.</p>
+    </div>
+  </div>
+
+  <!-- CONVEYOR -->
+  <div class="conveyor-zone" id="conveyorZone">
+    <div class="conveyor-head">
+      <div class="conveyor-intro">
+        <p class="plate">Illustrative approval path</p>
+        <h2 class="conveyor-title">Watch one file reach Meta—with its decision receipt.</h2>
+        <p class="conveyor-lede">The pilot checks a finished creative, asks the client to decide on that exact version, records who approved what and when, then tests publishing the same file into the chosen Meta ad set as <strong>PAUSED</strong> and reading the status back. Budget, audience, bid, and activation remain yours.</p>
+      </div>
+      <span class="sample-band">Illustrative · sample data</span>
+    </div>
+    <div class="track-wrap">
+      <div class="track" id="track" aria-hidden="true">
+        <div class="track-context">
+          <span class="track-context-label">Same file throughout</span>
+          <span class="track-file-lock"><strong>spring-launch-v2.png</strong><span>v2</span></span>
+        </div>
+        <div class="track-line">
+          <span class="track-segment" data-track-segment="0"></span><span class="track-segment" data-track-segment="1"></span><span class="track-segment" data-track-segment="2"></span><span class="track-segment" data-track-segment="3"></span>
+        </div>
+        <div class="stations">
+          <div class="station" data-station="intake">
+            <div class="station-node"></div>
+            <div class="station-label"><span class="plate">File ready</span><span class="station-tag">exact version</span></div>
+          </div>
+          <div class="station" data-station="preflight">
+            <div class="station-node"></div>
+            <div class="station-label"><span class="plate">Review checks</span><span class="station-tag">file · copy · link</span></div>
+          </div>
+          <div class="station" data-station="decision">
+            <div class="station-node"></div>
+            <div class="station-label"><span class="plate">Client decision</span><span class="station-tag">exact version</span></div>
+          </div>
+          <div class="station" data-station="receipt">
+            <div class="station-node"></div>
+            <div class="station-label"><span class="plate">Receipt</span><span class="station-tag">who · what · when</span></div>
+          </div>
+          <div class="station" data-station="adset">
+            <div class="station-node"></div>
+            <div class="station-label"><span class="plate">Meta publish</span><span class="station-tag">status read back</span></div>
+          </div>
+        </div>
+        <div class="feedback-lane">
+          <div class="station-feedback" id="feedbackIntake" data-station="intake">
+            <span class="feedback-step"><span class="feedback-index">01</span><span class="feedback-step-label">Exact file</span></span>
+            <span class="feedback-copy"><strong>One finished creative enters the path.</strong><small>Version 2 becomes the single file used for checks, approval, the receipt, and the Meta publish.</small></span>
+            <span class="feedback-proof"><span class="proof-file"><strong>spring-launch-v2.png</strong><small>1080 × 1350 · v2</small></span><span class="proof-state">Ready</span></span>
+          </div>
+          <div class="station-feedback" id="feedbackPreflight" data-station="preflight">
+            <span class="feedback-step"><span class="feedback-index">02</span><span class="feedback-step-label">Review checks</span></span>
+            <span class="feedback-copy"><strong id="preflightLabel">Checking the ad before review.</strong><small id="preflightMeta">File format, ad copy, and the destination link are checked before Maya sees the ad.</small></span>
+            <span class="feedback-detail"><span class="pf-row" id="pf1">File</span><span class="pf-row" id="pf2">Ad copy</span><span class="pf-row" id="pf3">Link</span></span>
+          </div>
+          <div class="station-feedback" id="feedbackDecision" data-station="decision">
+            <span class="feedback-step"><span class="feedback-index">03</span><span class="feedback-step-label">Decision</span></span>
+            <span class="feedback-copy"><strong id="decisionLabel">Maya reviews this exact version.</strong><small id="decisionMeta">Her answer attaches to version 2—not a filename buried in a chat thread.</small></span>
+            <span class="feedback-proof"><span class="proof-avatar">MC</span><span class="proof-file"><strong>Maya Chen</strong><small>Client reviewer</small></span><span class="decision-pill" id="decisionPill">Reviewing…</span></span>
+          </div>
+          <div class="station-feedback" id="feedbackReceipt" data-station="receipt">
+            <span class="feedback-step"><span class="feedback-index">04</span><span class="feedback-step-label">Receipt</span></span>
+            <span class="feedback-copy"><strong id="receiptLabel">Approval becomes a receipt.</strong><small id="receiptMeta">Who decided, what they saw, and when they answered stay attached to version 2.</small></span>
+            <span class="feedback-proof receipt-proof"><span class="receipt-line mono" id="receiptLine">r-7f3c · APPROVE · v2</span><span class="receipt-meta">Maya Chen · 14:02</span></span>
+          </div>
+          <div class="station-feedback" id="feedbackAdset" data-station="adset">
+            <span class="feedback-step"><span class="feedback-index">05</span><span class="feedback-step-label">Publish</span></span>
+            <span class="feedback-copy"><strong id="publishLabel">Published—and Meta confirmed PAUSED.</strong><small id="publishMeta">The approved version, returned ad ID, and delivery state now agree. You decide when to activate it in Meta.</small></span>
+            <span class="feedback-proof handoff-proof"><span class="proof-file"><strong>spring-retargeting</strong><small>Chosen Meta ad set</small></span></span>
+          </div>
+        </div>
+        <div class="creative" id="creative">
+          <div class="creative-card">
+            <div class="thumb"><img src="assets/spring-launch-v2.webp" width="480" height="600" alt="" decoding="async"></div>
+            <span class="cap">spring-launch-v2.png</span>
+            <span class="creative-version">v2</span>
+            <span class="ring brand" id="ringBrand"></span><span class="ring warn" id="ringWarn"></span><span class="ring ok" id="ringOk"></span>
+          </div>
+        </div>
+        <div class="slot" id="adsetSlot"></div>
+      </div>
+      <div class="conveyor-controls">
+        <div class="conveyor-actions">
+          <button class="conveyor-control" id="conveyorSkip" type="button" aria-label="Skip to final state" hidden><span>Skip to final state</span></button>
+          <button class="conveyor-control" id="conveyorReplay" type="button" aria-label="Replay walkthrough" hidden><span>Replay walkthrough ↻</span></button>
+        </div>
+      </div>
+      <p class="visually-hidden" id="conveyorLive" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p class="visually-hidden">Illustrative demonstration of the proposed pilot path: a finished ad image passes file, copy, and destination-link checks before review. The client approves it from a no-login link. An approval receipt is appended: r-7f3c, approve, version 2, 14:02. The example then shows that same creative published into a chosen Meta ad set with status PAUSED and the status read back, where it waits for the operator to activate it. This is sample data, not live software.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 PRODUCT ================= -->
+<section class="section wrap" id="path" aria-labelledby="path-h">
+  <div class="sec-head reveal">
+    <p class="plate">02 · The product</p>
+    <h2 id="path-h">From clean creative to a verifiable Meta publish.</h2>
+    <p class="sec-lede">Three moments are designed to remove the handoff work between a finished ad, a client’s answer, and publishing the approved version into the right Meta ad set as PAUSED.</p>
+  </div>
+  <div class="product-stage">
+    <div class="feature-tabs reveal" role="tablist" aria-label="Product walkthrough">
+      <button class="feature-tab" id="featureTab1" data-feature-tab type="button" role="tab" aria-controls="step1" aria-selected="true"><span class="tab-number">01 · </span>Review checks</button>
+      <button class="feature-tab" id="featureTab2" data-feature-tab type="button" role="tab" aria-controls="step2" aria-selected="false" tabindex="-1"><span class="tab-number">02 · </span>Decision</button>
+      <button class="feature-tab" id="featureTab3" data-feature-tab type="button" role="tab" aria-controls="step3" aria-selected="false" tabindex="-1"><span class="tab-number">03 · </span>Publish</button>
+    </div>
+    <div class="feature-panels">
+      <article class="feature-panel is-active reveal" id="step1" data-feature-panel role="tabpanel" aria-labelledby="featureTab1" tabindex="0">
+        <div class="feature-layout">
+          <div class="feature-copy"><p class="plate">01 · Before review</p><h3>Catch the avoidable problems first.</h3><p>File size, ad copy, and destination checks happen before you ask a client to review. Anything uncertain is held for you.</p><div class="feature-point">Send one clean version instead of correcting it after approval</div></div>
+          <div class="demo-window" aria-label="Illustrative preview of review checks on an example creative">
+            <div class="demo-topbar"><div class="demo-title"><span>spring-launch-v2.png</span></div><span class="demo-sample">Illustrative / sample</span></div>
+            <div class="proof-grid">
+              <figure class="proof-creative"><img src="assets/spring-launch-v2.webp" width="480" height="600" alt="Fictional Ridgeline Coffee spring campaign creative" loading="lazy" decoding="async"><figcaption class="proof-file">spring-launch-v2.png · 1080×1350</figcaption></figure>
+              <div><div class="task-stack">
+                <div class="task-row"><span class="task-icon ok">✓</span><span class="task-copy"><strong>File format</strong><small>1080×1350 · 480&nbsp;KB</small></span><span class="task-state">PASS</span></div>
+                <div class="task-row"><span class="task-icon ok">✓</span><span class="task-copy"><strong>Ad copy</strong><small>primary text · 87 / 125</small></span><span class="task-state">PASS</span></div>
+                <div class="task-row"><span class="task-icon ok">✓</span><span class="task-copy"><strong>Destination link</strong><small>ridgeline.example/spring</small></span><span class="task-state">PASS</span></div>
+                <div class="task-row"><span class="task-icon warn">!</span><span class="task-copy"><strong>Stale year</strong><small>human confirmation requested</small></span><span class="task-state">REVIEW</span></div>
+              </div><div class="proof-ready"><span>3 passed · 1 human review</span><span class="chip is-warn">CHECK</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="feature-panel reveal" id="step2" data-feature-panel role="tabpanel" aria-labelledby="featureTab2" tabindex="0">
+        <div class="feature-layout">
+          <div class="feature-copy"><p class="plate">02 · One link</p><h3>Get a decision you can act on.</h3><p>The client sees the actual creative and chooses Approve, Request changes, or Pass. Their choice stays attached to that exact version.</p><div class="feature-point">No translating an email or chat reply into campaign work</div></div>
+          <div class="demo-window" aria-label="Illustrative preview of a client decision and its receipt">
+            <div class="demo-topbar"><div class="demo-title"><span>Ridgeline Coffee · v2</span></div><span class="demo-sample">Illustrative / sample</span></div>
+            <div class="decision-demo">
+              <div><div class="approval-device"><img src="assets/spring-launch-v2.webp" width="480" height="600" alt="Fictional Ridgeline Coffee spring campaign creative" loading="lazy" decoding="async"><div class="approval-name"><strong>Spring launch</strong><span>v2</span></div></div><div class="decision-actions" aria-label="Try a sample decision"><button class="decision-action" type="button" data-decision="approve" aria-pressed="true">Approve</button><button class="decision-action" type="button" data-decision="change" aria-pressed="false">Request changes</button><button class="decision-action" type="button" data-decision="pass" aria-pressed="false">Pass</button></div></div>
+              <div class="decision-result" id="decisionResult" data-state="approve" aria-live="polite"><span class="result-mark" id="decisionResultMark">✓</span><h4 id="decisionResultTitle">Approved</h4><p id="decisionResultCopy">Maya approved version 2. That exact version is ready to publish to the chosen Meta ad set as PAUSED.</p><div class="result-receipt" id="decisionResultReceipt">r-7f3c · approve · v2 · Maya · 14:02</div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="feature-panel reveal" id="step3" data-feature-panel role="tabpanel" aria-labelledby="featureTab3" tabindex="0">
+        <div class="feature-layout">
+          <div class="feature-copy"><p class="plate">03 · Approval to Meta</p><h3>Publish the exact ad your client approved.</h3><p>In the proposed pilot, the client’s approval stays with version 2. That same version goes to the Meta ad set you chose, but stays PAUSED. The ad is in Meta, but cannot spend until you turn it on.</p><div class="feature-point">No downloading the approved ad just to upload it again</div></div>
+          <div class="demo-window" aria-label="Illustrative preview showing an approved ad version published to Meta as paused">
+            <div class="demo-topbar"><div class="demo-title"><span>From client approval to Meta</span></div><span class="demo-sample">Illustrative / sample</span></div>
+            <div class="record-grid">
+              <div class="record-list"><div class="record-head"><span>VERSION</span><span>CLIENT ANSWER</span><span>TIME</span></div><div class="record-row"><span class="record-version">v1</span><span class="record-decision"><strong>Changes requested</strong><small>r-7f3b · Maya</small></span><span class="chip is-warn">13:52</span></div><div class="record-row"><span class="record-version">v2</span><span class="record-decision"><strong>Approved</strong><small>r-7f3c · Maya</small></span><span class="chip is-ok">14:02</span></div></div>
+              <div class="handoff-card" id="handoffCard" data-state="ready"><div><span class="eyebrow">Chosen Meta ad set</span><h4>spring-retargeting</h4><p id="handoffNote">Version 2 is approved and ready for this ad set. The pilot would add it to Meta as PAUSED, so it cannot spend yet.</p></div><div><div class="handoff-status" role="status" aria-live="polite" aria-atomic="true"><span id="handoffStatusLabel">NEXT STEP</span><span class="chip is-held" id="handoffStatus">READY</span></div><button class="btn btn-ghost demo-stage-button" id="stageDemoButton" type="button" aria-disabled="false">Show publish result</button></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 CONTROL ================= -->
+<section class="section control-band" id="rails" aria-labelledby="rails-h">
+  <div class="wrap">
+    <div class="sec-head control-head reveal">
+      <p class="plate">03 · Publish checkpoint</p>
+      <h2 id="rails-h">PAUSED isn’t the finish line. It’s the safe start in Meta.</h2>
+      <p class="sec-lede">Choose any illustrative creative below to see the same bounded handoff. The proposed pilot publishes that exact approved static file to its chosen Meta ad set as <strong>PAUSED</strong>, reads the returned status and ad ID, then tells the operator to find that ID manually in Ads Manager. Budget, audience, bid, timing, campaign structure, and ACTIVE stay native to Meta.</p>
+    </div>
+
+    <div class="control-theatre reveal">
+      <section class="control-gallery" aria-labelledby="creative-gallery-h">
+        <div class="control-gallery-head">
+          <h3 class="control-gallery-title" id="creative-gallery-h">Choose an illustrative creative</h3>
+          <span class="control-gallery-count">5 styles · static ads</span>
+        </div>
+        <div class="creative-mosaic" role="group" aria-label="Choose an illustrative creative for the ad-ID handoff preview">
+          <button class="format-card" type="button" disabled aria-pressed="true" data-control-creative data-creative="Trail launch · v4" data-adset="ridgeline-prospecting" data-ad-id="ad 12020948731" aria-label="Preview the Performance creative handoff">
+            <img src="assets/control-trail-shoe-v1.webp" width="800" height="1000" alt="Fictional outdoor running-shoe campaign creative" loading="lazy" decoding="async">
+            <span class="format-selected">Selected</span><span class="format-shape">4:5</span><span class="format-meta"><span class="format-name"><strong>Performance</strong><small>Outdoor editorial</small></span></span>
+          </button>
+          <button class="format-card" type="button" disabled aria-pressed="false" data-control-creative data-creative="Daily serum · v2" data-adset="serum-retargeting" data-ad-id="ad 12020948744" aria-label="Preview the Product creative handoff">
+            <img src="assets/control-serum-v1.webp" width="800" height="800" alt="Fictional minimalist skincare campaign creative" loading="lazy" decoding="async">
+            <span class="format-selected">Selected</span><span class="format-shape">1:1</span><span class="format-meta"><span class="format-name"><strong>Product</strong><small>Quiet luxury</small></span></span>
+          </button>
+          <button class="format-card" type="button" disabled aria-pressed="false" data-control-creative data-creative="Treat time · v3" data-adset="atlas-pet-launch" data-ad-id="ad 12020948758" aria-label="Preview the Playful creative handoff">
+            <img src="assets/control-dog-v1.webp" width="800" height="800" alt="Fictional playful pet-treat campaign creative" loading="lazy" decoding="async">
+            <span class="format-selected">Selected</span><span class="format-shape">1:1</span><span class="format-meta"><span class="format-name"><strong>Playful</strong><small>Studio action</small></span></span>
+          </button>
+          <button class="format-card" type="button" disabled aria-pressed="false" data-control-creative data-creative="Reading light · v1" data-adset="northline-lifestyle" data-ad-id="ad 12020948763" aria-label="Preview the Home creative handoff">
+            <img src="assets/control-lamp-v1.webp" width="800" height="1422" alt="Fictional design-led homeware campaign creative" loading="lazy" decoding="async">
+            <span class="format-selected">Selected</span><span class="format-shape">9:16</span><span class="format-meta"><span class="format-name"><strong>Home</strong><small>Lifestyle</small></span></span>
+          </button>
+          <button class="format-card" type="button" disabled aria-pressed="false" data-control-creative data-creative="Spring launch · v2" data-adset="spring-retargeting" data-ad-id="ad 12020948779" aria-label="Preview the Food and drink creative handoff">
+            <img src="assets/spring-launch-v2.webp" width="480" height="600" alt="Fictional editorial coffee campaign creative" loading="lazy" decoding="async">
+            <span class="format-selected">Selected</span><span class="format-shape">4:5</span><span class="format-meta"><span class="format-name"><strong>Food &amp; drink</strong><small>Editorial product</small></span></span>
+          </button>
+        </div>
+        <p class="gallery-foot"><span><strong>Choose a style; the checkpoint follows that exact example.</strong></span><span>Finished static images only in the current pilot.</span></p>
+      </section>
+
+      <aside class="control-console" aria-label="Illustrative Meta publish result and operator activation checkpoint">
+        <div class="control-console-head"><span class="control-console-title">Meta publish result</span><span class="control-console-sample">Illustrative</span></div>
+        <div class="publish-readback">
+          <div class="publish-state"><span>Published to Meta</span><strong>PAUSED</strong></div>
+          <div class="publish-selection"><span>Selected approved creative</span><strong id="controlCreative">Trail launch · v4</strong></div>
+          <h3 id="controlAdset">ridgeline-prospecting</h3>
+          <span class="publish-id" id="controlAdId">ad 12020948731 · status read back</span>
+        </div>
+        <ol class="control-sequence" aria-label="Publish and activation sequence">
+          <li><span class="sequence-mark">✓</span><span class="sequence-copy"><strong>Approved creative published</strong><small id="controlSequenceCreative">Trail launch · v4 lands in its chosen ad set.</small></span></li>
+          <li><span class="sequence-mark">✓</span><span class="sequence-copy"><strong>Meta confirms PAUSED</strong><small>The returned ad ID and delivery state are recorded.</small></span></li>
+          <li class="is-yours"><span class="sequence-mark">3</span><span class="sequence-copy"><strong>You find the returned ad ID in Ads Manager</strong><small>Use the recorded ID for manual lookup, review the native settings there, then decide whether to switch it ACTIVE.</small></span></li>
+        </ol>
+        <div class="activation-guard" aria-label="Activation remains paused until the operator switches it in Meta">
+          <div class="guard-kicker"><span>Ad-ID handoff</span><span>Operator action</span></div>
+          <div class="activation-lock"><span class="activation-copy"><strong>One recorded ID. Honest manual lookup.</strong><small>The product records the PAUSED ad ID; the operator uses it to find the ad in Ads Manager. No verified deep link ships today.</small></span><button class="activation-action" id="handoffPreviewToggle" type="button" disabled aria-expanded="false" aria-controls="handoffPreview">Preview the lookup handoff <span class="activation-action-icon" aria-hidden="true">↗</span></button><span class="activation-fallback">Illustrative action: use this ad ID in Ads Manager</span></div>
+          <div class="handoff-preview" id="handoffPreview" hidden>
+            <span class="handoff-preview-kicker">Illustrative operator lookup</span>
+            <strong>Find <span id="handoffPreviewCreative">Trail launch · v4</span> in <span id="handoffPreviewAdset">ridgeline-prospecting</span> using its recorded ad ID.</strong>
+            <p>The pilot records the returned ID for manual lookup in Ads Manager. Review the native settings and choose whether to make it ACTIVE there. This landing preview does not connect to Meta, open Ads Manager, or change an ad.</p>
+            <span class="handoff-route"><span>Senditor</span><b>→</b><span>Ad ID · manual lookup</span></span>
+          </div>
+        </div>
+        <p class="control-limit"><strong>What Clawmont does not touch:</strong> budgets, bids, targeting, campaign structure, or ACTIVE status.</p>
+        <p class="visually-hidden" id="controlLive" role="status" aria-live="polite"></p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<aside class="honesty-strip" aria-label="Product status"><div class="wrap"><p><strong>One honest note:</strong> every screen and ad above is an illustrative preview with example data. Meta is the only connector, and the live publish-and-read-back path is still the pilot’s proof gate—not a claimed customer result.</p></div></aside>
+
+<!-- ================= 04 PRODUCT SESSION ================= -->
+<section class="section wrap" id="who" aria-labelledby="who-h">
+  <div class="sec-head reveal">
+    <p class="plate">04 · Product session</p>
+    <h2 id="who-h">One approval session, seen from both sides.</h2>
+    <p class="sec-lede">These captures come from the current Cockpit Design direction. Choose a moment to see the operator’s returned batch, the client’s review page, and the bounded handoff back to Meta. They are design proposals, not shipped product screenshots.</p>
+  </div>
+  <div class="audience-wrap reveal">
+    <div class="audience-tabs" role="tablist" aria-label="Approval session views">
+      <button class="audience-tab" id="audienceTab1" data-audience-tab type="button" role="tab" aria-controls="audience1" aria-selected="true">Batch returned</button>
+      <button class="audience-tab" id="audienceTab2" data-audience-tab type="button" role="tab" aria-controls="audience2" aria-selected="false" tabindex="-1">Client review</button>
+      <button class="audience-tab" id="audienceTab3" data-audience-tab type="button" role="tab" aria-controls="audience3" aria-selected="false" tabindex="-1">Meta handoff</button>
+    </div>
+    <div class="audience-stage" id="audienceStage" role="region" tabindex="0" aria-roledescription="carousel" aria-label="Approval session views">
+      <article class="audience-panel is-active" id="audience1" data-audience-panel role="tabpanel" aria-labelledby="audienceTab1">
+        <div class="audience-copy"><p class="plate">Operator · returned batch</p><h3>See the client’s answer against every creative.</h3><p>The returned batch keeps each yes, no, and comment beside the exact asset that received it—along with the production record and open findings.</p><p class="audience-moment">Four approved. One rejected with a comment. No reply has to be translated from a chat thread.</p></div>
+        <figure class="session-frame">
+          <div class="session-top"><span class="session-title"><span class="session-lights"><span></span></span>Dashboard · batch returned</span><span class="session-label">Cockpit study</span></div>
+          <div class="session-canvas"><img class="session-shot" src="assets/dashboard-batch-session.webp" width="779" height="650" alt="Cockpit Design dashboard session showing a five-creative batch with four approved ads, one rejected ad, one comment, costs, and open quality findings" loading="lazy" decoding="async"></div>
+          <figcaption class="session-source"><strong>Design direction · illustrative surface</strong><span>Real generated batch · fictional client</span></figcaption>
+        </figure>
+      </article>
+      <article class="audience-panel" id="audience2" data-audience-panel role="tabpanel" aria-labelledby="audienceTab2">
+        <div class="audience-copy"><p class="plate">Client · focused review</p><h3>Give the client one page with one job.</h3><p>The client sees the actual ad, decides yes or no, and can leave a note. They do not need Meta access, and nothing runs when they send the page back.</p><p class="audience-moment">The review surface stays calm because campaign controls and internal dashboard noise never reach the client.</p></div>
+        <figure class="session-frame session-frame--client">
+          <div class="session-top"><span class="session-title"><span class="session-lights"><span></span></span>Ridgeline Coffee · client review</span><span class="session-label">Cockpit study</span></div>
+          <div class="session-canvas"><img class="session-shot" src="assets/client-approval-session.webp" width="520" height="780" alt="Cockpit Design client approval session showing five ads ready for a clear yes or no and the first Facebook feed preview" loading="lazy" decoding="async"></div>
+          <figcaption class="session-source"><strong>Design direction · illustrative surface</strong><span>Real generated creative · fictional client</span></figcaption>
+        </figure>
+      </article>
+      <article class="audience-panel" id="audience3" data-audience-panel role="tabpanel" aria-labelledby="audienceTab3">
+        <div class="audience-copy"><p class="plate">Operator · bounded handoff</p><h3>Make the next action obvious—and bounded.</h3><p>The dashboard keeps the returned decision next to the publish checkpoint. Only approved creatives move forward, Meta write access is explicit, and every created ad starts PAUSED.</p><p class="audience-moment">The product removes the upload hunt; the operator still owns every spend decision in Meta.</p></div>
+        <figure class="session-frame session-frame--handoff">
+          <div class="session-top"><span class="session-title"><span class="session-lights"><span></span></span>Dashboard · approval to Meta</span><span class="session-label">Cockpit study</span></div>
+          <div class="session-canvas"><img class="session-shot" src="assets/dashboard-handoff-session.webp" width="640" height="341" alt="Cockpit Design dashboard session showing the client reply followed by a launch-approved-only checkpoint that requires Meta write access and creates ads paused" loading="lazy" decoding="async"></div>
+          <figcaption class="session-source"><strong>Design direction · private build</strong><span>Not a live Meta account</span></figcaption>
+        </figure>
+      </article>
+    </div>
+    <div class="audience-controls"><span class="audience-count" id="audienceCount">1 of 3</span><div class="slider-buttons"><button class="slider-button" id="audiencePrev" type="button" aria-label="Previous audience example">←</button><button class="slider-button" id="audienceNext" type="button" aria-label="Next audience example">→</button></div></div>
+    <p class="visually-hidden" id="audienceLive" role="status" aria-live="polite"></p>
+  </div>
+  <p class="disqualifier reveal"><strong>If you need budget automation or campaign creation, this isn’t it, by design.</strong> We don’t write budgets, bids, targeting, or campaign structure — see the rails above. The screens here are Cockpit Design proposals, not evidence of a shipped dashboard.</p>
+</section>
+
+<!-- ================= 05 APPLY ================= -->
+<section class="section" id="apply" aria-labelledby="apply-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="plate">05 · Apply</p>
+      <h2 id="apply-h">Apply for the pilot.</h2>
+      <p class="sec-lede">Bring one brand and one real approval workflow. We’ll agree the pilot terms with you, learn where the handoff still creates work, and show you the exact records created along the way. It runs on your own ad account. We set it up with you on a 30-minute call.</p>
+    </div>
+    <form class="form-card reveal" id="applyForm" action="mailto:support@clawmont.com?subject=Pilot%20application%20%E2%80%94%20Senditor" method="post" enctype="text/plain" novalidate>
+      <div class="field" id="fName">
+        <label for="name">Name</label>
+        <input class="input" id="name" name="name" type="text" autocomplete="name" aria-describedby="errName" required>
+        <p class="err-msg" id="errName" role="alert">Please enter your name.</p>
+      </div>
+      <div class="field" id="fEmail">
+        <label for="email">Email</label>
+        <input class="input" id="email" name="email" type="email" autocomplete="email" spellcheck="false" aria-describedby="errEmail" required>
+        <p class="err-msg" id="errEmail" role="alert">Please enter a valid email address.</p>
+      </div>
+      <fieldset id="fBrands" aria-describedby="errBrands">
+        <legend>Brands on Meta</legend>
+        <div class="radio-row" role="radiogroup" aria-label="Brands on Meta">
+          <label class="radio-pill"><input type="radio" name="brands" value="1–3" required><span>1–3</span></label>
+          <label class="radio-pill"><input type="radio" name="brands" value="4–8"><span>4–8</span></label>
+          <label class="radio-pill"><input type="radio" name="brands" value="9+"><span>9+</span></label>
+        </div>
+        <p class="err-msg" id="errBrands" role="alert">Please choose a range.</p>
+      </fieldset>
+      <div class="field">
+        <label for="signoff">What does sign-off look like today? <span class="hint">(optional)</span></label>
+        <textarea class="textarea" id="signoff" name="signoff"></textarea>
+      </div>
+      <button class="btn btn-primary" id="applySubmit" type="submit">Apply for the pilot</button>
+      <a class="btn btn-primary no-js-only" href="mailto:support@clawmont.com?subject=Pilot%20application%20%E2%80%94%20Senditor">Email your pilot application</a>
+      <p class="form-footnote">There’s no form backend yet — submitting opens a pre-filled email to <a class="tlink" href="mailto:support@clawmont.com">support@clawmont.com</a>. We reply personally during the pilot. Without JavaScript, use the email link directly.</p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <p style="font-size:14px;color:var(--ink-2)">support@clawmont.com · replies are handled personally during the pilot</p>
+    <div class="footer-links">
+      <a class="tlink" href="mailto:support@clawmont.com?subject=Privacy%20question%20%E2%80%94%20Senditor">Privacy</a>
+      <a class="tlink" href="mailto:support@clawmont.com?subject=Data%20deletion%20request%20%E2%80%94%20Senditor">Data deletion</a>
+      <button class="theme-toggle" id="themeToggle2" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var docEl = document.documentElement;
+var reduceMQ = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+var reduceMotion = !!(reduceMQ && reduceMQ.matches);
+
+/* ---------- theme ---------- */
+function setTheme(t){
+  docEl.setAttribute("data-theme", t);
+  var themeColor = document.getElementById("themeColor");
+  if(themeColor) themeColor.setAttribute("content", t === "dark" ? "#191512" : "#F7F4EF");
+  ["themeToggle","themeToggle2"].forEach(function(id){
+    var button = document.getElementById(id);
+    if(!button) return;
+    var isDark = t === "dark";
+    button.setAttribute("aria-pressed", isDark ? "true" : "false");
+    button.setAttribute("aria-label", isDark ? "Switch to light theme" : "Switch to dark theme");
+  });
+  try{ localStorage.setItem("ml-theme", t); }catch(e){}
+}
+var stored = null;
+try{ stored = localStorage.getItem("ml-theme"); }catch(e){}
+if(stored === "dark" || stored === "light"){ setTheme(stored); }
+else if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){ setTheme("dark"); }
+["themeToggle","themeToggle2"].forEach(function(id){
+  var b = document.getElementById(id);
+  if(b) b.addEventListener("click", function(){
+    setTheme(docEl.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+});
+
+/* ---------- hero reveal (state lives on body so every .rise reaches it) ---------- */
+function revealHero(){ document.body.classList.add("played"); }
+var heroIntro = document.getElementById("heroIntro");
+var heroScrollRAF = 0;
+function syncHeroField(){
+  heroScrollRAF = 0;
+  if(!heroIntro || reduceMotion) return;
+  var bounds = heroIntro.getBoundingClientRect();
+  var progress = Math.max(0,Math.min(1,-bounds.top/Math.max(1,bounds.height)));
+  heroIntro.style.setProperty("--hero-scroll",progress.toFixed(3));
+}
+function scheduleHeroField(){
+  if(heroScrollRAF || reduceMotion) return;
+  heroScrollRAF = requestAnimationFrame(syncHeroField);
+}
+if(!reduceMotion){
+  window.addEventListener("scroll",scheduleHeroField,{passive:true});
+  window.addEventListener("resize",scheduleHeroField);
+  requestAnimationFrame(syncHeroField);
+}
+
+/* ---------- conveyor choreography: one cancellable, visibility-aware timeline ---------- */
+var zone = document.getElementById("conveyorZone");
+var track = document.getElementById("track");
+var creative = document.getElementById("creative");
+var stations = Array.prototype.slice.call(track.querySelectorAll(".station"));
+var trackSegments = Array.prototype.slice.call(track.querySelectorAll(".track-segment"));
+var feedbacks = Array.prototype.slice.call(track.querySelectorAll(".station-feedback"));
+var conveyorLive = document.getElementById("conveyorLive");
+var conveyorSkip = document.getElementById("conveyorSkip");
+var conveyorReplay = document.getElementById("conveyorReplay");
+var adsetSlot = document.getElementById("adsetSlot");
+var receiptLine = document.getElementById("receiptLine");
+var decisionPill = document.getElementById("decisionPill");
+var rings = {brand:document.getElementById("ringBrand"),warn:document.getElementById("ringWarn"),ok:document.getElementById("ringOk")};
+var conveyorRAF = 0, conveyorElapsed = 0, conveyorLast = 0, conveyorEvent = 0, conveyorVisible = false, conveyorStarted = false, conveyorComplete = false, currentStation = 0;
+var conveyorControlSwapTimer = 0;
+var creativeMotionAnimation = null, creativeMotionToken = 0, creativeX = 0, creativeTargetX = 0, creativeHasPosition = false;
+var creativeSettledCallback = null;
+var conveyorAnnounceCompletion = false, geometryRAF = 0;
+
+function setCreativeX(x){
+  creativeX = x;
+  creative.style.transform = "translate3d(" + x.toFixed(3) + "px,0,0)";
+}
+function stopCreativeMotion(){
+  creativeMotionToken += 1;
+  if(creativeMotionAnimation){ creativeMotionAnimation.cancel(); creativeMotionAnimation = null; }
+  creative.classList.remove("is-moving");
+  creative.style.opacity = ""; creative.style.filter = "";
+  creativeSettledCallback = null;
+}
+function finishCreativeMotion(token){
+  if(token !== creativeMotionToken) return;
+  if(creativeMotionAnimation){ creativeMotionAnimation.cancel(); creativeMotionAnimation = null; }
+  setCreativeX(creativeTargetX); creative.style.opacity = ""; creative.style.filter = "";
+  creative.classList.remove("is-moving");
+  var settledCallback = creativeSettledCallback;
+  creativeSettledCallback = null;
+  if(settledCallback) settledCallback();
+}
+function setCreativeTarget(x, immediate, onSettled){
+  stopCreativeMotion();
+  creativeTargetX = x;
+  creativeSettledCallback = onSettled || null;
+  if(immediate || reduceMotion || !creativeHasPosition || Math.abs(x - creativeX) < .5 || !creative.animate){
+    creativeHasPosition = true; setCreativeX(x);
+    var immediateCallback = creativeSettledCallback;
+    creativeSettledCallback = null;
+    if(immediateCallback) immediateCallback();
+    return;
+  }
+  var fromX = creativeX, direction = x >= fromX ? 1 : -1;
+  var token = ++creativeMotionToken;
+  creative.classList.add("is-moving");
+  creativeMotionAnimation = creative.animate([
+    {opacity:1,filter:"blur(0px)",transform:"translate3d(" + fromX.toFixed(3) + "px,0,0) scale(1)"},
+    {opacity:0,filter:"blur(2px)",transform:"translate3d(" + (fromX + direction * 14).toFixed(3) + "px,0,0) scale(.95)"}
+  ],{duration:180,easing:"cubic-bezier(.4,0,1,1)",fill:"both"});
+  if(document.hidden) creativeMotionAnimation.pause();
+  creativeMotionAnimation.finished.then(function(){
+    if(token !== creativeMotionToken) return;
+    creative.style.opacity = "0"; setCreativeX(x);
+    creativeMotionAnimation.cancel();
+    creativeMotionAnimation = creative.animate([
+      {opacity:0,filter:"blur(2px)",transform:"translate3d(" + (x - direction * 12).toFixed(3) + "px,0,0) scale(.95)"},
+      {opacity:1,filter:"blur(0px)",transform:"translate3d(" + x.toFixed(3) + "px,0,0) scale(1)"}
+    ],{duration:320,easing:"cubic-bezier(.16,1,.3,1)",fill:"both"});
+    if(document.hidden) creativeMotionAnimation.pause();
+    return creativeMotionAnimation.finished.then(function(){ finishCreativeMotion(token); });
+  }).catch(function(){});
+}
+function positionSlot(){
+  var trackRect = track.getBoundingClientRect();
+  var finalRect = stations[stations.length - 1].getBoundingClientRect();
+  var slotX = finalRect.left - trackRect.left - track.clientLeft + finalRect.width / 2 - adsetSlot.offsetWidth / 2;
+  slotX = Math.max(4, Math.min(track.clientWidth - adsetSlot.offsetWidth - 4, slotX));
+  adsetSlot.style.left = slotX.toFixed(3) + "px";
+}
+function positionCreative(index, immediate, onSettled){
+  var trackRect = track.getBoundingClientRect();
+  var stationRect = stations[index].getBoundingClientRect();
+  var x = stationRect.left - trackRect.left - track.clientLeft + stationRect.width / 2 - creative.offsetWidth / 2;
+  x = Math.max(4, Math.min(track.clientWidth - creative.offsetWidth - 4, x));
+  positionSlot();
+  setCreativeTarget(x, immediate, onSettled);
+}
+function setStation(index, immediate, onSettled){
+  currentStation = index;
+  zone.style.setProperty("--conveyor-progress", (index / Math.max(1, stations.length - 1)).toFixed(3));
+  zone.setAttribute("data-step", String(index + 1));
+  stations.forEach(function(s, i){ s.classList.toggle("is-complete", i < index); s.classList.toggle("is-active", i === index); });
+  trackSegments.forEach(function(segment, i){
+    segment.classList.toggle("is-complete", i < index - 1);
+    segment.classList.toggle("is-active", i === index - 1);
+  });
+  adsetSlot.classList.toggle("is-receiving", index === stations.length - 1 && !adsetSlot.classList.contains("readback"));
+  positionCreative(index, immediate, onSettled);
+}
+function completeStation(index){
+  stations.forEach(function(s, i){
+    s.classList.toggle("is-complete", i <= index);
+    s.classList.toggle("is-active", i === index);
+  });
+  trackSegments.forEach(function(segment, i){
+    segment.classList.toggle("is-complete", i < index);
+    segment.classList.remove("is-active");
+  });
+}
+function showFeedback(id){
+  feedbacks.forEach(function(f){ f.classList.remove("show","is-past"); });
+  var target = document.getElementById(id);
+  target.classList.add("show");
+}
+function updateFeedback(id,label,meta){
+  var target=document.getElementById(id), copy=target.querySelector(".feedback-copy");
+  copy.querySelector("strong").textContent=label; copy.querySelector("small").textContent=meta;
+  if(!reduceMotion && copy.animate){
+    if(copy.getAnimations) copy.getAnimations().forEach(function(animation){ animation.cancel(); });
+    copy.animate([{opacity:.2,transform:"translateY(5px)"},{opacity:1,transform:"translateY(0)"}],{duration:420,easing:"cubic-bezier(.16,1,.3,1)"});
+  }
+}
+function clearControlHandoff(){
+  if(conveyorControlSwapTimer) clearTimeout(conveyorControlSwapTimer);
+  conveyorControlSwapTimer = 0;
+  conveyorReplay.classList.remove("is-handoff");
+  conveyorReplay.removeAttribute("aria-disabled");
+  var replayLabel = conveyorReplay.querySelector("span");
+  if(replayLabel) replayLabel.textContent = "Replay walkthrough ↻";
+}
+function showRunningControls(withHandoff){
+  clearControlHandoff();
+  if(!withHandoff || reduceMotion){
+    conveyorSkip.hidden = false; conveyorReplay.hidden = true;
+    return;
+  }
+  var transferFocus = document.activeElement === conveyorReplay;
+  conveyorSkip.hidden = true; conveyorReplay.hidden = false;
+  conveyorReplay.classList.add("is-handoff");
+  conveyorReplay.setAttribute("aria-disabled","true");
+  var replayLabel = conveyorReplay.querySelector("span");
+  if(replayLabel) replayLabel.textContent = "Restarting…";
+  conveyorControlSwapTimer = setTimeout(function(){
+    conveyorControlSwapTimer = 0;
+    conveyorReplay.classList.remove("is-handoff");
+    conveyorReplay.removeAttribute("aria-disabled");
+    if(replayLabel) replayLabel.textContent = "Replay walkthrough ↻";
+    conveyorReplay.hidden = true; conveyorSkip.hidden = false;
+    if(transferFocus) conveyorSkip.focus({preventScroll:true});
+  },520);
+}
+function resetConveyor(animateReset){
+  if(conveyorRAF) cancelAnimationFrame(conveyorRAF);
+  conveyorRAF = 0; conveyorElapsed = animateReset ? -1200 : 0; conveyorLast = 0; conveyorEvent = 0; conveyorComplete = false;
+  stopCreativeMotion();
+  feedbacks.forEach(function(f){ f.classList.remove("show","is-past","press","done"); });
+  ["pf1","pf2","pf3"].forEach(function(id){ document.getElementById(id).classList.remove("tick"); });
+  receiptLine.classList.remove("on"); adsetSlot.classList.remove("readback","is-receiving"); creative.classList.remove("idle","is-hidden","is-docked");
+  Object.keys(rings).forEach(function(k){ rings[k].classList.remove("on"); });
+  document.getElementById("preflightLabel").textContent = "Checking the ad before review."; document.getElementById("preflightMeta").textContent = "File format, ad copy, and the destination link are checked before Maya sees the ad.";
+  document.getElementById("decisionLabel").textContent = "Maya reviews this exact version."; document.getElementById("decisionMeta").textContent = "Her answer attaches to version 2—not a filename buried in a chat thread.";
+  document.getElementById("receiptLabel").textContent = "Approval becomes a receipt."; document.getElementById("receiptMeta").textContent = "Who decided, what they saw, and when they answered stay attached to version 2.";
+  document.getElementById("publishLabel").textContent = "Publishing the approved file to the chosen ad set."; document.getElementById("publishMeta").textContent = "The pilot creates it as PAUSED, then reads the delivery state back from Meta. Spend controls remain untouched.";
+  document.getElementById("feedbackDecision").classList.remove("is-approved");
+  decisionPill.classList.remove("is-approved"); decisionPill.textContent = "Reviewing…";
+  zone.classList.add("played"); setStation(0, !animateReset);
+  showRunningControls(animateReset);
+}
+function applyFinalState(announce){
+  conveyorComplete = true;
+  clearControlHandoff();
+  feedbacks.forEach(function(f){ f.classList.remove("show","is-past","press","done"); });
+  document.getElementById("feedbackAdset").classList.add("show");
+  document.getElementById("preflightLabel").textContent = "Ready for review."; document.getElementById("preflightMeta").textContent = "File format, ad copy, and the destination link passed their checks.";
+  document.getElementById("decisionLabel").textContent = "Maya approved version 2."; document.getElementById("decisionMeta").textContent = "Her answer is locked to the exact file she reviewed.";
+  document.getElementById("receiptLabel").textContent = "The decision is recorded."; document.getElementById("receiptMeta").textContent = "Maya Chen · version 2 · approved at 14:02.";
+  document.getElementById("feedbackDecision").classList.add("is-approved");
+  decisionPill.classList.add("is-approved"); decisionPill.textContent = "Approved";
+  ["pf1","pf2","pf3"].forEach(function(id){ document.getElementById(id).classList.add("tick"); });
+  receiptLine.classList.add("on"); adsetSlot.classList.remove("is-receiving"); adsetSlot.classList.add("readback"); creative.classList.add("is-docked");
+  updateFeedback("feedbackAdset","Published—and Meta confirmed PAUSED.","The approved version, returned ad ID, and delivery state now agree. You decide when to activate it in Meta.");
+  Object.keys(rings).forEach(function(k){ rings[k].classList.remove("on"); });
+  rings.ok.classList.add("on"); completeStation(4);
+  conveyorSkip.hidden = true; conveyorReplay.hidden = false;
+  if(announce || conveyorAnnounceCompletion) conveyorLive.textContent = "Sample path complete. The creative is published to Meta as PAUSED; activation stays yours.";
+  conveyorAnnounceCompletion = false;
+}
+function renderFinal(announce){
+  clearControlHandoff();
+  if(conveyorRAF) cancelAnimationFrame(conveyorRAF);
+  conveyorRAF = 0; conveyorComplete = true; conveyorStarted = true;
+  conveyorAnnounceCompletion = conveyorAnnounceCompletion || announce;
+  feedbacks.forEach(function(f){ f.classList.remove("show","is-past","press","done"); });
+  adsetSlot.classList.remove("readback","is-receiving"); creative.classList.remove("is-docked");
+  Object.keys(rings).forEach(function(k){ rings[k].classList.remove("on"); });
+  conveyorSkip.hidden = true; conveyorReplay.hidden = true;
+  setStation(4, reduceMotion, function(){ applyFinalState(announce); });
+}
+var conveyorEvents = [
+  [450,function(){ rings.brand.classList.add("on"); showFeedback("feedbackIntake"); }],
+  [3100,function(){ rings.brand.classList.remove("on"); rings.ok.classList.add("on"); completeStation(0); }],
+  [3700,function(){ rings.ok.classList.remove("on"); feedbacks.forEach(function(f){ f.classList.remove("show"); }); setStation(1); }],
+  [4300,function(){ showFeedback("feedbackPreflight"); }],
+  [4800,function(){ document.getElementById("pf1").classList.add("tick"); }],
+  [5400,function(){ document.getElementById("pf2").classList.add("tick"); }],
+  [6000,function(){ document.getElementById("pf3").classList.add("tick"); }],
+  [6600,function(){ rings.ok.classList.add("on"); completeStation(1); updateFeedback("feedbackPreflight","Ready for review.","File format, ad copy, and the destination link passed their checks."); }],
+  [7300,function(){ rings.ok.classList.remove("on"); feedbacks.forEach(function(f){ f.classList.remove("show"); }); setStation(2); }],
+  [7900,function(){ rings.warn.classList.add("on"); showFeedback("feedbackDecision"); }],
+  [11000,function(){ rings.warn.classList.remove("on"); rings.ok.classList.add("on"); completeStation(2); document.getElementById("feedbackDecision").classList.add("is-approved"); decisionPill.classList.add("is-approved"); decisionPill.textContent = "Approved"; updateFeedback("feedbackDecision","Maya approved version 2.","Her answer is locked to the exact file she reviewed."); }],
+  [11800,function(){ rings.ok.classList.remove("on"); feedbacks.forEach(function(f){ f.classList.remove("show"); }); setStation(3); }],
+  [12400,function(){ showFeedback("feedbackReceipt"); }],
+  [13200,function(){ receiptLine.classList.add("on"); }],
+  [14800,function(){ rings.ok.classList.add("on"); completeStation(3); updateFeedback("feedbackReceipt","The decision is recorded.","Maya Chen · version 2 · approved at 14:02."); }],
+  [15500,function(){
+    rings.ok.classList.remove("on"); feedbacks.forEach(function(f){ f.classList.remove("show"); });
+    setStation(4);
+  }],
+  [16100,function(){ rings.brand.classList.add("on"); showFeedback("feedbackAdset"); }],
+  [19000,function(){ applyFinalState(false); }]
+];
+function conveyorFrame(ts){
+  conveyorRAF = 0;
+  if(!conveyorVisible || document.hidden || conveyorComplete) return;
+  if(!conveyorLast) conveyorLast = ts;
+  conveyorElapsed += Math.min(64, ts - conveyorLast); conveyorLast = ts;
+  while(conveyorEvent < conveyorEvents.length && conveyorEvents[conveyorEvent][0] <= conveyorElapsed){ conveyorEvents[conveyorEvent][1](); conveyorEvent++; }
+  if(!conveyorComplete) conveyorRAF = requestAnimationFrame(conveyorFrame);
+}
+function resumeConveyor(){
+  if(creativeMotionAnimation){ if(document.hidden) creativeMotionAnimation.pause(); else creativeMotionAnimation.play(); }
+  if(conveyorVisible && !document.hidden && conveyorStarted && !conveyorComplete && !conveyorRAF){ conveyorLast = 0; conveyorRAF = requestAnimationFrame(conveyorFrame); }
+}
+function playConveyor(userInitiated){
+  resetConveyor(userInitiated); conveyorStarted = true; conveyorAnnounceCompletion = userInitiated;
+  if(userInitiated) conveyorLive.textContent = "Replaying the sample creative path from Intake.";
+  resumeConveyor();
+}
+conveyorSkip.addEventListener("click", function(){ renderFinal(true); });
+conveyorReplay.addEventListener("click", function(){ if(conveyorReplay.classList.contains("is-handoff")) return; playConveyor(true); });
+document.addEventListener("visibilitychange", resumeConveyor);
+function scheduleGeometryUpdate(){
+  if(geometryRAF) return;
+  geometryRAF = requestAnimationFrame(function(){
+    geometryRAF = 0;
+    var pendingSettle = creativeSettledCallback;
+    positionCreative(currentStation, true);
+    if(pendingSettle) pendingSettle();
+  });
+}
+window.addEventListener("resize", scheduleGeometryUpdate);
+if(window.ResizeObserver){ new ResizeObserver(scheduleGeometryUpdate).observe(track); }
+
+if(reduceMotion){ zone.classList.add("played"); renderFinal(false); revealHero(); }
+else{
+  if(document.readyState === "complete") revealHero(); else window.addEventListener("load", revealHero);
+  resetConveyor(false);
+  if("IntersectionObserver" in window){
+    new IntersectionObserver(function(entries){ entries.forEach(function(en){ if(en.target !== zone) return; conveyorVisible = en.isIntersecting && en.intersectionRatio >= .35; if(conveyorVisible && !conveyorStarted) playConveyor(false); else resumeConveyor(); }); },{threshold:[0,.35,.7]}).observe(zone);
+  }else{ conveyorVisible = true; playConveyor(false); }
+}
+
+/* ---------- reveals ---------- */
+var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+var revealed = new WeakSet();
+function revealElement(el){ if(revealed.has(el)) return; revealed.add(el); el.classList.add("in"); }
+function revealPassed(){
+  reveals.forEach(function(el){ if(!revealed.has(el) && el.getBoundingClientRect().top < window.innerHeight * .92) revealElement(el); });
+}
+if("IntersectionObserver" in window){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(!en.isIntersecting || revealed.has(en.target)) return;
+      revealElement(en.target);
+    });
+  },{threshold:.15});
+  reveals.forEach(function(el){ io.observe(el); });
+}else{
+  reveals.forEach(revealElement);
+}
+window.addEventListener("scroll", revealPassed, {passive:true});
+window.addEventListener("resize", revealPassed);
+requestAnimationFrame(revealPassed);
+
+/* ---------- product tabs ---------- */
+var featureTabs = Array.prototype.slice.call(document.querySelectorAll("[data-feature-tab]"));
+var featurePanels = Array.prototype.slice.call(document.querySelectorAll("[data-feature-panel]"));
+var featureIndex = Math.max(0, featurePanels.findIndex(function(p){ return "#" + p.id === window.location.hash; }));
+function activateFeature(index, focus, updateHash){
+  index = (index + featureTabs.length) % featureTabs.length; featureIndex = index;
+  featureTabs.forEach(function(tab,i){ tab.setAttribute("aria-selected", i===index ? "true":"false"); tab.tabIndex = i===index ? 0:-1; });
+  featurePanels.forEach(function(panel,i){ if(panel.getAnimations) panel.getAnimations().forEach(function(a){a.cancel();}); panel.hidden = i!==index; panel.classList.toggle("is-active",i===index); });
+  var active = featurePanels[index];
+  if(!reduceMotion && active.animate) active.animate([{opacity:0,transform:"translateY(10px)"},{opacity:1,transform:"translateY(0)"}],{duration:280,easing:"cubic-bezier(.16,1,.3,1)"});
+  if(focus) featureTabs[index].focus();
+  if(updateHash){ try{ history.replaceState(null,"","#" + active.id); }catch(e){} }
+}
+featureTabs.forEach(function(tab,index){
+  tab.addEventListener("click",function(){activateFeature(index,false,true);});
+  tab.addEventListener("keydown",function(e){ var next=null; if(e.key==="ArrowRight")next=index+1; if(e.key==="ArrowLeft")next=index-1; if(e.key==="Home")next=0; if(e.key==="End")next=featureTabs.length-1; if(next!==null){e.preventDefault();activateFeature(next,true,true);} });
+});
+activateFeature(featureIndex,false,false);
+if(featurePanels.some(function(panel){ return "#" + panel.id === window.location.hash; })){
+  requestAnimationFrame(function(){
+    var activePanel = featurePanels[featureIndex];
+    var top = activePanel.getBoundingClientRect().top + window.scrollY - 88;
+    window.scrollTo({top:Math.max(0,top),left:0,behavior:"auto"});
+  });
+}
+
+/* ---------- decision branches + sample handoff ---------- */
+var decisionData = {
+  approve:{mark:"✓",title:"Approved",copy:"Maya approved version 2. That exact version is ready to publish to the chosen Meta ad set as PAUSED.",receipt:"r-7f3c · approve · v2 · Maya · 14:02"},
+  change:{mark:"↺",title:"Change requested",copy:"Version 2 will not be sent to Meta. It stays here until Maya approves a revised version.",receipt:"r-7f3d · change-request · v2 · Maya · 14:06"},
+  pass:{mark:"—",title:"Passed",copy:"Maya passed on version 2, so it will not be sent to Meta.",receipt:"r-7f3e · pass · v2 · Maya · 14:08"}
+};
+Array.prototype.forEach.call(document.querySelectorAll("[data-decision]"),function(button){ button.addEventListener("click",function(){
+  var state=button.getAttribute("data-decision"), data=decisionData[state], result=document.getElementById("decisionResult");
+  Array.prototype.forEach.call(document.querySelectorAll("[data-decision]"),function(b){b.setAttribute("aria-pressed",b===button?"true":"false");});
+  result.setAttribute("data-state",state); document.getElementById("decisionResultMark").textContent=data.mark; document.getElementById("decisionResultTitle").textContent=data.title; document.getElementById("decisionResultCopy").textContent=data.copy; document.getElementById("decisionResultReceipt").textContent=data.receipt;
+  if(!reduceMotion && result.animate) result.animate([{opacity:.35,transform:"translateY(5px)"},{opacity:1,transform:"translateY(0)"}],{duration:240,easing:"cubic-bezier(.16,1,.3,1)"});
+}); });
+var stageDemoButton=document.getElementById("stageDemoButton");
+stageDemoButton.addEventListener("click",function(){
+  if(stageDemoButton.getAttribute("aria-disabled") === "true") return;
+  var card=document.getElementById("handoffCard");
+  card.setAttribute("data-state","staged"); document.getElementById("handoffStatus").textContent="PAUSED";
+  document.getElementById("handoffStatusLabel").textContent="STATUS IN META";
+  document.getElementById("handoffNote").textContent="Version 2 is now in this ad set as PAUSED. It cannot spend until you turn it on in Meta.";
+  stageDemoButton.textContent="Published as PAUSED"; stageDemoButton.setAttribute("aria-disabled","true");
+  if(!reduceMotion&&card.animate)card.animate([{transform:"scale(.985)"},{transform:"scale(1)"}],{duration:260,easing:"cubic-bezier(.16,1,.3,1)"});
+});
+
+/* ---------- ad-ID handoff preview: one selected creative, one bounded next action ---------- */
+var controlCards=Array.prototype.slice.call(document.querySelectorAll("[data-control-creative]"));
+var controlCreative=document.getElementById("controlCreative");
+var controlAdset=document.getElementById("controlAdset");
+var controlAdId=document.getElementById("controlAdId");
+var controlSequenceCreative=document.getElementById("controlSequenceCreative");
+var handoffPreviewCreative=document.getElementById("handoffPreviewCreative");
+var handoffPreviewAdset=document.getElementById("handoffPreviewAdset");
+var controlLive=document.getElementById("controlLive");
+var controlConsole=document.querySelector("#rails .control-console");
+var handoffPreviewToggle=document.getElementById("handoffPreviewToggle");
+var handoffPreview=document.getElementById("handoffPreview");
+var handoffPreviewAnimation=null;
+var handoffPreviewRevision=0;
+
+function animateControlConsole(){
+  if(reduceMotion || !controlConsole || !controlConsole.animate) return;
+  var pieces=[controlConsole.querySelector(".publish-readback")].concat(Array.prototype.slice.call(controlConsole.querySelectorAll(".control-sequence li")));
+  pieces.forEach(function(piece,index){
+    if(!piece) return;
+    if(piece.getAnimations)piece.getAnimations().forEach(function(animation){animation.cancel();});
+    piece.animate([{opacity:.42,transform:"translate3d(0,7px,0)"},{opacity:1,transform:"translate3d(0,0,0)"}],{duration:280,delay:index*42,easing:"cubic-bezier(.16,1,.3,1)"});
+  });
+}
+function selectControlCreative(card,announce){
+  if(!card) return;
+  controlCards.forEach(function(candidate){
+    var selected=candidate===card;
+    candidate.setAttribute("aria-pressed",selected?"true":"false");
+    candidate.tabIndex=selected?0:-1;
+  });
+  var creative=card.getAttribute("data-creative");
+  var adset=card.getAttribute("data-adset");
+  var adId=card.getAttribute("data-ad-id");
+  controlCreative.textContent=creative;
+  controlAdset.textContent=adset;
+  controlAdId.textContent=adId+" · status read back";
+  controlSequenceCreative.textContent=creative+" lands in its chosen ad set.";
+  handoffPreviewCreative.textContent=creative;
+  handoffPreviewAdset.textContent=adset;
+  animateControlConsole();
+  if(announce)controlLive.textContent="Previewing "+creative+" in the ad-ID handoff. Illustrative Meta result: PAUSED.";
+}
+controlCards.forEach(function(card,index){
+  card.disabled=false;
+  card.tabIndex=card.getAttribute("aria-pressed")==="true"?0:-1;
+  card.addEventListener("click",function(){selectControlCreative(card,true);});
+  card.addEventListener("keydown",function(event){
+    var next=null;
+    if(event.key==="ArrowRight"||event.key==="ArrowDown")next=index+1;
+    if(event.key==="ArrowLeft"||event.key==="ArrowUp")next=index-1;
+    if(event.key==="Home")next=0;
+    if(event.key==="End")next=controlCards.length-1;
+    if(next===null)return;
+    event.preventDefault();
+    next=(next+controlCards.length)%controlCards.length;
+    selectControlCreative(controlCards[next],true);
+    controlCards[next].focus();
+  });
+});
+selectControlCreative(controlCards.find(function(card){return card.getAttribute("aria-pressed")==="true";})||controlCards[0],false);
+
+function setHandoffPreview(open,announce){
+  var revision=++handoffPreviewRevision;
+  if(handoffPreviewAnimation){handoffPreviewAnimation.cancel();handoffPreviewAnimation=null;}
+  handoffPreviewToggle.setAttribute("aria-expanded",open?"true":"false");
+  if(open){
+    handoffPreview.hidden=false;
+    if(!reduceMotion&&handoffPreview.animate){
+      handoffPreviewAnimation=handoffPreview.animate([{opacity:0,transform:"translate3d(0,-7px,0) scale(.985)"},{opacity:1,transform:"translate3d(0,0,0) scale(1)"}],{duration:280,easing:"cubic-bezier(.16,1,.3,1)"});
+      handoffPreviewAnimation.onfinish=function(){if(revision===handoffPreviewRevision)handoffPreviewAnimation=null;};
+    }
+    if(announce)controlLive.textContent="Meta lookup preview open. This illustrative action uses the returned ad ID for manual lookup in Ads Manager.";
+    return;
+  }
+  if(reduceMotion||!handoffPreview.animate){handoffPreview.hidden=true;}
+  else{
+    handoffPreviewAnimation=handoffPreview.animate([{opacity:1,transform:"translate3d(0,0,0) scale(1)"},{opacity:0,transform:"translate3d(0,-7px,0) scale(.985)"}],{duration:180,easing:"cubic-bezier(.4,0,1,1)"});
+    handoffPreviewAnimation.onfinish=function(){
+      if(revision!==handoffPreviewRevision)return;
+      handoffPreview.hidden=true;handoffPreviewAnimation=null;
+    };
+  }
+  if(announce)controlLive.textContent="Meta lookup preview closed.";
+}
+handoffPreviewToggle.disabled=false;
+handoffPreviewToggle.addEventListener("click",function(){setHandoffPreview(handoffPreviewToggle.getAttribute("aria-expanded")!=="true",true);});
+
+/* ---------- audience slider: manual, last input wins ---------- */
+var audienceTabs=Array.prototype.slice.call(document.querySelectorAll("[data-audience-tab]"));
+var audiencePanels=Array.prototype.slice.call(document.querySelectorAll("[data-audience-panel]"));
+var audienceIndex=0;
+function activateAudience(next,focus,announce){
+  var previous=audienceIndex, direction=next===previous?0:(next>previous?1:-1);
+  next=(next+audiencePanels.length)%audiencePanels.length; audienceIndex=next;
+  audiencePanels.forEach(function(panel,i){if(panel.getAnimations)panel.getAnimations().forEach(function(a){a.cancel();});panel.classList.remove("is-entering");panel.hidden=i!==next;panel.classList.toggle("is-active",i===next);});
+  audienceTabs.forEach(function(tab,i){tab.setAttribute("aria-selected",i===next?"true":"false");tab.tabIndex=i===next?0:-1;});
+  var active=audiencePanels[next]; active.classList.add("is-entering");
+  if(!reduceMotion&&active.animate)active.animate([{opacity:0,transform:"translateX("+(direction*28)+"px)"},{opacity:1,transform:"translateX(0)"}],{duration:360,easing:"cubic-bezier(.16,1,.3,1)"});
+  document.getElementById("audienceCount").textContent=(next+1)+" of "+audiencePanels.length;
+  if(announce)document.getElementById("audienceLive").textContent="Showing "+audienceTabs[next].textContent+", "+(next+1)+" of "+audiencePanels.length;
+  if(focus)audienceTabs[next].focus();
+}
+audienceTabs.forEach(function(tab,index){tab.addEventListener("click",function(){activateAudience(index,false,true);});tab.addEventListener("keydown",function(e){var next=null;if(e.key==="ArrowRight")next=index+1;if(e.key==="ArrowLeft")next=index-1;if(e.key==="Home")next=0;if(e.key==="End")next=audienceTabs.length-1;if(next!==null){e.preventDefault();activateAudience(next,true,true);}});});
+document.getElementById("audiencePrev").addEventListener("click",function(){activateAudience(audienceIndex-1,false,true);});
+document.getElementById("audienceNext").addEventListener("click",function(){activateAudience(audienceIndex+1,false,true);});
+var audienceStage=document.getElementById("audienceStage"),pointerX=null,pointerId=null;
+audienceStage.addEventListener("keydown",function(e){if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();activateAudience(audienceIndex+(e.key==="ArrowRight"?1:-1),false,true);}});
+audienceStage.addEventListener("pointerdown",function(e){pointerX=e.clientX;pointerId=e.pointerId;if(audienceStage.setPointerCapture)audienceStage.setPointerCapture(e.pointerId);});
+audienceStage.addEventListener("pointerup",function(e){if(pointerX===null||pointerId!==e.pointerId)return;var delta=e.clientX-pointerX;pointerX=null;pointerId=null;if(Math.abs(delta)>=48)activateAudience(audienceIndex+(delta<0?1:-1),false,true);});
+audienceStage.addEventListener("pointercancel",function(){pointerX=null;pointerId=null;});
+activateAudience(0,false,false);
+
+/* ---------- run-line ---------- */
+var runFill = document.getElementById("runFill");
+var runLine = document.querySelector(".run-line");
+var ticking = false;
+var raf = window.requestAnimationFrame
+  ? function(f){ window.requestAnimationFrame(f); }
+  : function(f){ f(); };
+function updateRunLine(){
+  ticking = false;
+  if(!runFill || !runLine) return;
+  var max = docEl.scrollHeight - window.innerHeight;
+  var p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+  if(window.innerWidth >= 1024){ runFill.style.transform = "scaleY(" + p + ")"; }
+  else{ runFill.style.transform = "scaleX(" + p + ")"; }
+  var tone = "brand";
+  var rails = document.getElementById("rails"), who = document.getElementById("who"), apply = document.getElementById("apply");
+  var mid = window.innerHeight * .5;
+  [rails, who, apply].filter(Boolean).some(function(sec){
+    var r = sec.getBoundingClientRect();
+    if(r.top <= mid && r.bottom >= mid){
+      tone = sec.id === "rails" ? "ok" : sec.id === "who" ? "warn" : "held";
+      return true;
+    }
+    return false;
+  });
+  if(runLine.getAttribute("data-tone") !== tone) runLine.setAttribute("data-tone", tone);
+}
+window.addEventListener("scroll", function(){
+  if(!ticking){ ticking = true; raf(updateRunLine); }
+}, {passive:true});
+window.addEventListener("resize", updateRunLine);
+updateRunLine();
+
+/* ---------- form ---------- */
+var form = document.getElementById("applyForm");
+var submitBtn = document.getElementById("applySubmit");
+var nameI = document.getElementById("name");
+var emailI = document.getElementById("email");
+var brandsRadios = form.querySelectorAll('input[name="brands"]');
+function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function setInvalid(container,input,invalid){
+  container.classList.toggle("invalid", invalid);
+  if(input) input.setAttribute("aria-invalid", invalid ? "true" : "false");
+}
+function validate(showAll){
+  var okN = nameI.value.trim().length > 0;
+  var okE = validEmail(emailI.value.trim());
+  var okB = !!form.querySelector('input[name="brands"]:checked');
+  var fName=document.getElementById("fName"), fEmail=document.getElementById("fEmail"), fBrands=document.getElementById("fBrands");
+  if(showAll || fName.classList.contains("invalid")) setInvalid(fName,nameI,!okN);
+  if(showAll || fEmail.classList.contains("invalid")) setInvalid(fEmail,emailI,!okE);
+  if(showAll || fBrands.classList.contains("invalid")){ fBrands.classList.toggle("invalid",!okB); fBrands.setAttribute("aria-invalid",!okB?"true":"false"); }
+  return okN && okE && okB;
+}
+nameI.addEventListener("blur",function(){ setInvalid(document.getElementById("fName"),nameI,nameI.value.trim().length===0); });
+emailI.addEventListener("blur",function(){ setInvalid(document.getElementById("fEmail"),emailI,!validEmail(emailI.value.trim())); });
+[nameI,emailI].forEach(function(i){ i.addEventListener("input",function(){ validate(false); }); });
+Array.prototype.forEach.call(brandsRadios,function(r){ r.addEventListener("change",function(){ var f=document.getElementById("fBrands"); f.classList.remove("invalid"); f.setAttribute("aria-invalid","false"); }); });
+
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+  if(!validate(true)){
+    if(nameI.getAttribute("aria-invalid") === "true") nameI.focus();
+    else if(emailI.getAttribute("aria-invalid") === "true") emailI.focus();
+    else if(document.getElementById("fBrands").getAttribute("aria-invalid") === "true" && brandsRadios.length) brandsRadios[0].focus();
+    return;
+  }
+  var nl = String.fromCharCode(10);
+  var subject = "Pilot application — Senditor · " + nameI.value.trim();
+  var body =
+    "Name: " + nameI.value.trim() + nl +
+    "Email: " + emailI.value.trim() + nl +
+    "Brands on Meta: " + (form.querySelector('input[name="brands"]:checked') || {}).value + nl +
+    "Sign-off today: " + (document.getElementById("signoff").value.trim() || "(not answered)") + nl;
+  window.location.href = "mailto:support@clawmont.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+});
+})();
+</script>
+</body>
+</html>

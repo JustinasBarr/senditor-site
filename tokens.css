@@ -1,0 +1,1035 @@
+/* ==========================================================================
+   COCKPIT — DESIGN TOKENS  v3.28 @ f9bc0b4  "BONE & COBALT"
+   --------------------------------------------------------------------------
+   THE SINGLE THEMING SURFACE. Every page links this file; no page inlines a
+   copy of it, and no component redefines a value ad hoc. Engineering skins
+   the real app by overriding tokens here and nowhere else.
+
+   Supersedes v1.0 "Ledger & Instrument" (founder decision, 2026-08-21).
+   The token ARCHITECTURE is inherited from the retired Cockpit-Design
+   worktree — density, type, client-hue and elevation families all survive.
+   Only the values and the typefaces changed.
+
+   THE ONE RULE, unchanged: chroma is meaning.
+   The chassis is achromatic — bone paper, espresso ink, warm hairlines.
+   Saturated colour appears only when it carries information.
+   ========================================================================== */
+
+/* --- Fonts. Deterministic local/system stacks; no network dependency. ----- */
+
+:root{
+  /* ── TYPEFACES ─────────────────────────────────────────────────────────
+     ui      — the platform UI sans for body, controls and figures.
+     serif   — an installed editorial serif for the few display moments.
+     mono    — the platform monospace for machine records and money.
+     display — the same local sans vocabulary, preserving the accepted token
+               contract without making first paint depend on a font host. */
+  --f-ui:    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --f-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --f-mono:  ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  --f-display: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --wd-display: 125;   /* the expanded end of the axis */
+  --wd-display-mid: 112;
+
+  /* ── TYPE SCALE ────────────────────────────────────────────────────────
+     UI body is 14px on desktop, 16px minimum on mobile. */
+  --t-plate:     11px;   /* instrument label, uppercase, tracked           */
+  --t-plate-sm:  10px;
+  --t-micro:     11px;   /* mono machine record                            */
+  --t-xs:        12px;
+  --t-sm:        13px;
+  --t-body:      14px;
+  --t-md:        16px;   /* mobile body minimum                            */
+  --t-lg:        18px;
+  --t-title:     20px;
+  --t-head:      24px;
+  --t-display:   34px;
+  --t-figure:    30px;   /* money, tabular                                 */
+  --t-figure-xl: 44px;
+
+  --lh-tight: 1.15;
+  --lh-snug:  1.3;
+  --lh-base:  1.5;
+  --lh-loose: 1.65;
+
+  /* NOTE FOR ENGINEERING: v1 set instrument PLATES with a width axis
+     (--wd-plate: 118). The plate is weight + tracking now, and --wd-plate is
+     gone. --wd-display and --wd-display-mid remain part of the accepted token
+     contract; a system fallback may ignore font-variation-settings:'wdth'.
+     Never emulate that axis with font-stretch. */
+  --tr-plate:  0.12em;
+  --tr-head:  -0.014em;
+  --tr-figure:-0.020em;
+  --tr-serif: -0.022em;
+
+  /* ── SPACE — 4px base ─────────────────────────────────────────────────── */
+  --s-0:  0;      --s-05: 2px;   --s-1:  4px;   --s-15: 6px;
+  --s-2:  8px;    --s-3:  12px;  --s-4:  16px;  --s-5:  20px;
+  --s-6:  24px;   --s-8:  32px;  --s-10: 40px;  --s-12: 48px;
+  --s-16: 64px;   --s-20: 80px;
+
+  /* ── RADIUS ────────────────────────────────────────────────────────────
+     Softer than v1. Bone & Cobalt is calm, not clinical — but panels stop
+     at 20px so nothing reads as a toy. */
+  /* QR does not flip with the theme. A scanner needs dark modules on a light
+     ground, and a code that might not scan is a code that does not work — so
+     these two sit in the theme-invariant block on purpose, the same call the
+     instrument surface makes for the same kind of reason (D-008). */
+  --qr-ground: #FFFFFF;
+  --qr-ink:    #1A1A1A;
+
+  --r-xs: 4px;  --r-sm: 6px;  --r-md: 10px; --r-lg: 14px;
+  --r-xl: 20px; --r-full: 999px;
+
+  /* ── MOTION ────────────────────────────────────────────────────────────── */
+  --dur-fast: 120ms;
+  --dur:      180ms;
+  --dur-slow: 320ms;
+  --ease:     cubic-bezier(.2, 0, 0, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+
+  /* ── LAYERS ────────────────────────────────────────────────────────────── */
+  --z-base: 0; --z-sticky: 10; --z-overlay: 20; --z-popover: 30; --z-toast: 50;
+
+  /* ── BORDER WIDTHS ─────────────────────────────────────────────────────── */
+  --bw: 1px;
+  --bw-state: 3px;   /* the state bar on the left edge of a run strip */
+
+  /* ── DENSITY ────────────────────────────────────────────────────────────
+     Two families, and the distinction is the whole rule.
+       --dp-*  PADDING inside a component.  Compact takes these.
+       --dz-*  SEPARATION between zones.    Compact must NOT touch these.
+     Separation tells the eye where one idea ends and the next begins. Take
+     the padding and a view gets denser; take the separation and it gets
+     crowded, which is a different and much worse thing.
+     Type size is never a density variable. */
+  --dp-card:  var(--s-4);
+  --dp-row:   var(--s-3);
+  --dp-strip: var(--s-3);
+  --dp-tight: var(--s-2);
+  --row-min:  34px;
+
+  --dz-deck:  var(--s-5);
+  --dz-zone:  var(--s-5);
+  --dz-strip: var(--s-2);
+}
+
+/* Compact. Never add a --dz-* override here — that is the line between
+   dense and crowded. */
+:root[data-density="compact"]{
+  --dp-card:  var(--s-3);
+  --dp-row:   var(--s-15);
+  --dp-strip: var(--s-2);
+  --dp-tight: var(--s-15);
+  --row-min:  30px;
+}
+
+/* ==========================================================================
+   LIGHT — "BONE". Warm paper, espresso ink, one confident accent.
+   Deliberately not the old ledger-green: this buyer makes beautiful things
+   and reads cool grey-green as accounting software.
+   ========================================================================== */
+:root,
+:root[data-theme="light"]{
+  color-scheme: light;
+
+  /* chassis */
+  --paper:        #F7F4EF;
+  --surface:      #FFFDFA;
+  --surface-2:    #FFFFFF;
+  --surface-sunk: #EFEAE2;
+  --line:         #E4DCD2;
+  --line-strong:  #CDC1B3;
+
+  /* ink */
+  --ink:   #221D19;
+  --ink-2: #6B6058;
+  --ink-3: #6A5F55;   /* clears AA on the worst ground (--surface-sunk) */
+  /* --decor — NOT an ink. Hairlines, dots, dividers, disabled glyphs: anything
+     a reader is never asked to read. 2.88:1 on paper, so it fails AA by design.
+
+     RENAMED FROM --ink-4, and the rename IS the fix. As the fourth member of
+     ink / ink-2 / ink-3 / ink-4 it read as "the faintest text", so "use it for
+     faint text" was the natural inference at every call site — and it landed on
+     real text three times despite a two-line warning sitting right here. The
+     comment fought the name and lost, three times out of three. `color:
+     var(--decor)` reads wrong on sight, so the mistake is now visible in a diff
+     instead of only in a sweep. Documentation is not a guard; a name is. */
+  --decor: #9A8F86;
+  /* --ink-4 is RETIRED, 2026-08-24. The note that stood here read "Marketing
+     consumes it in five places and is mid-build". Five became zero and nobody
+     told the comment — a hand-written description of ANOTHER party's state,
+     going stale because that party changed. Same shape as the retireAfter
+     proxy it sat next to, one comment over. Verified zero call sites across
+     Marketing's whole repo and every surface here before removing it. */
+
+  /* brand — cobalt. "Our engine is acting": identity, progress, focus.
+     NEVER a verdict. */
+  --brand:        #2C46D8;
+  --brand-strong: #1F33A8;
+  --brand-ink:    #FFFFFF;
+  --brand-soft:   #DFE3FB;
+  --brand-faint:  #F0F2FE;
+
+  /* semantic state — a verdict about the work. Never used for chrome.
+     Re-tuned to sit on warm bone rather than cool vellum. */
+  --ok:     #2C6A43;  --ok-fill:     #35804F;  --ok-soft:     #DFEDE2;
+  --warn:   #8A5A0B;  --warn-fill:   #B8801C;  --warn-soft:   #F6E8CF;
+  --danger: #B02F26;  --danger-fill: #C2483D;  --danger-soft: #F8E1DD;
+  /* held moved OFF blue: cobalt owns blue now, and a blue "paused" beside a
+     cobalt "running" is unreadable. Warm stone reads as parked, not broken. */
+  --held:   #6E6154;  --held-fill:   #6B5E51;  --held-soft:   #ECE5DA;
+  --on-fill: #FFFFFF;
+  /* Amber is the one fill that cannot take white ink at any usable
+     brightness. Every *-fill takes --on-fill EXCEPT warn, which takes this. */
+  --on-warn: #2E1F05;
+
+  /* elevation — warm shadows. A cool shadow on bone paper turns it grey. */
+  --shadow-1: 0 1px 1px -.5px rgba(34,29,25,.06), 0 1px 0 rgba(34,29,25,.035);
+  --shadow-2: 0 1px 2px rgba(34,29,25,.05), 0 14px 30px -20px rgba(34,29,25,.30);
+  --shadow-3: 0 2px 4px rgba(34,29,25,.04), 0 46px 90px -46px rgba(34,29,25,.42);
+  --shadow-press: inset 0 2px 4px -1px rgba(34,29,25,.14);
+  --edge:        inset 0 1px 0 rgba(255,255,255,.70);
+  --edge-strong: inset 0 1px 0 rgba(255,255,255,.90), inset 0 -1px 0 rgba(34,29,25,.05);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,.75);
+
+  /* focus — the brand hue: focus is the engine listening. */
+  --focus: var(--brand);
+  --focus-halo: rgba(44,70,216,.22);
+
+  /* How loudly real work may sit behind a headline. A token, not a number in
+     a component, because it has to differ per theme: these plates are
+     light-toned, so the same opacity that reads as texture on bone punches
+     as a row of lit rectangles on espresso. */
+  --sheet-opacity: .46;
+
+  /* ── ATMOSPHERE ─────────────────────────────────────────────────────────
+     The air the page floats in. Added v2.1 for the landing's calm direction.
+
+     THE RULE THAT KEEPS "CHROMA IS MEANING" INTACT:
+     **Atmosphere is never a fill.** It has no edge, it sits behind every
+     component, and it is never applied to a chip, a row, a panel or a
+     status. A colour with an edge means something. A colour without one is
+     just air. Nothing here may be used to say anything.
+
+     Why translucency is safe here and was not in the reference material:
+     this backdrop is OURS and bounded. Its luminance range is narrow by
+     construction, so text over it is measurable. Glass over an arbitrary
+     photograph cannot make that promise, which is why we rejected it. */
+  --atm-lift: #FFFDFA;   /* top of the wash — the light comes from above  */
+  --atm-base: #F7F4EF;   /* the floor of the wash — equals --paper        */
+  --atm-warm: #F8EDE0;   /* warm pool, low chroma                         */
+  --atm-cool: #ECEEFB;   /* cobalt pool, low chroma                       */
+
+  /* Veil — the ground a panel uses when it should dissolve into the wash
+     rather than sit on it in a box. Text on veil is still text on a known
+     range, so it is contrast-tested like any other ground. */
+  --atm-veil:      rgba(255,253,250,.70);
+  --atm-veil-line: rgba(34,29,25,.07);
+
+  /* The ambient mass. One slow soft shape behind the hero, blurred past
+     recognition. Landing hero only — on a cockpit this is noise competing
+     with real state. */
+  --blob-a: #D9DFF8;   /* cobalt breath  */
+  --blob-b: #F8E6D2;   /* warm breath    */
+  --blob-c: #E9E5F3;   /* the fold between them */
+  --blob-opacity: .78;
+  --blob-blur:    60px;  /* enough to hide the shape, not the hue movement */
+
+  /* CLIENT HUE — a :root default, added v3.1.
+     --client is otherwise defined only under [data-client=...], so any surface
+     that forgets the attribute resolves var(--client) to nothing and the
+     element renders blank. That is not hypothetical: it shipped on our own
+     approval page (white mark on bone, 1.02:1) and Marketing's page.py emits
+     data-client conditionally, so it is absent whenever a client has no hue.
+     A decorative identity colour must never be able to blank an element, so
+     the unset case falls back to the brand rather than to nothing.
+     Call sites should STILL write var(--client, var(--brand)) — this default
+     protects the case where tokens.css loads but the attribute does not. */
+  --client:   var(--brand);
+  --client-2: var(--brand-strong);
+
+  --scrim: rgba(34,29,25,.44);
+}
+
+/* ==========================================================================
+   DARK — "ESPRESSO". A warm brown-black, not neutral and not blue.
+   ========================================================================== */
+:root[data-theme="dark"]{
+  color-scheme: dark;
+
+  --paper:        #191512;
+  --surface:      #221D19;
+  --surface-2:    #2B2521;
+  --surface-sunk: #120F0C;
+  --line:         #332C27;
+  --line-strong:  #4A4139;
+
+  --ink:   #F4EFE9;
+  --ink-2: #A99E94;
+  --ink-3: #9A8E83;
+  --decor: #6B6159;
+
+  --brand:        #8098FF;
+  --brand-strong: #A5B6FF;
+  --brand-ink:    #11163C;
+  --brand-soft:   #22254D;
+  --brand-faint:  #1A1C36;
+
+  --ok:     #5FBE7C;  --ok-fill:     #27693F;  --ok-soft:     #13291B;
+  --warn:   #E0A526;  --warn-fill:   #7A560C;  --warn-soft:   #2B2110;
+  --danger: #F0766A;  --danger-fill: #A8352B;  --danger-soft: #2C1714;
+  --held:   #B0A192;  --held-fill:   #524638;  --held-soft:   #241E18;
+  --on-fill: #F4EFE9;
+  /* inverted from light: the dark theme's amber fill is deep, so it takes
+     light ink. --on-warn always means "the readable ink for --warn-fill". */
+  --on-warn: #F6E8CF;
+
+  --shadow-1: 0 1px 1px -.5px rgba(0,0,0,.5), 0 1px 0 rgba(0,0,0,.3);
+  --shadow-2: 0 1px 2px rgba(0,0,0,.30), 0 14px 30px -20px rgba(0,0,0,.60);
+  --shadow-3: 0 2px 4px rgba(0,0,0,.30), 0 46px 90px -46px rgba(0,0,0,.75);
+  --shadow-press: inset 0 2px 5px -1px rgba(0,0,0,.55);
+  --edge:        inset 0 1px 0 rgba(255,255,255,.055);
+  --edge-strong: inset 0 1px 0 rgba(255,255,255,.085), inset 0 -1px 0 rgba(0,0,0,.28);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,.05);
+
+  --focus: var(--brand);
+  --focus-halo: rgba(128,152,255,.30);
+
+  /* ── ATMOSPHERE (espresso) — see the light block for the rule. --------- */
+  --atm-lift: #221D19;
+  --atm-base: #191512;
+  --atm-warm: #241A11;
+  --atm-cool: #15182D;
+  --atm-veil:      rgba(34,29,25,.62);
+  --atm-veil-line: rgba(255,255,255,.06);
+  --blob-a: #262E63;
+  --blob-b: #3B2716;
+  --blob-c: #241F38;
+  --blob-opacity: .72;
+  --blob-blur:    60px;
+
+  --scrim: rgba(0,0,0,.62);
+
+  --sheet-opacity: .30;
+}
+
+/* Follows the OS when the operator has made no explicit choice. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper: #191512;  --surface: #221D19;  --surface-2: #2B2521;
+    --surface-sunk: #120F0C; --line: #332C27; --line-strong: #4A4139;
+    --ink: #F4EFE9; --ink-2: #A99E94; --ink-3: #9A8E83; --decor: #6B6159;
+    --brand: #8098FF; --brand-strong: #A5B6FF; --brand-ink: #11163C;
+    --brand-soft: #22254D; --brand-faint: #1A1C36;
+    --ok: #5FBE7C; --ok-fill: #27693F; --ok-soft: #13291B;
+    --warn: #E0A526; --warn-fill: #7A560C; --warn-soft: #2B2110;
+    --danger: #F0766A; --danger-fill: #A8352B; --danger-soft: #2C1714;
+    --held: #B0A192; --held-fill: #524638; --held-soft: #241E18;
+    --on-fill: #F4EFE9; --on-warn: #F6E8CF;
+    --shadow-1: 0 1px 1px -.5px rgba(0,0,0,.5), 0 1px 0 rgba(0,0,0,.3);
+    --shadow-2: 0 1px 2px rgba(0,0,0,.30), 0 14px 30px -20px rgba(0,0,0,.60);
+    --shadow-3: 0 2px 4px rgba(0,0,0,.30), 0 46px 90px -46px rgba(0,0,0,.75);
+    --shadow-press: inset 0 2px 5px -1px rgba(0,0,0,.55);
+    --edge:        inset 0 1px 0 rgba(255,255,255,.055);
+    --edge-strong: inset 0 1px 0 rgba(255,255,255,.085), inset 0 -1px 0 rgba(0,0,0,.28);
+    --shadow-inset: inset 0 1px 0 rgba(255,255,255,.05);
+    --focus-halo: rgba(128,152,255,.30);
+    --atm-lift: #221D19; --atm-base: #191512;
+    --atm-warm: #241A11; --atm-cool: #15182D;
+    --atm-veil: rgba(34,29,25,.62); --atm-veil-line: rgba(255,255,255,.06);
+    --blob-a: #262E63; --blob-b: #3B2716; --blob-c: #241F38;
+    --blob-opacity: .72; --blob-blur: 60px;
+    --scrim: rgba(0,0,0,.62);
+    --sheet-opacity: .30;
+  }
+}
+
+/* ==========================================================================
+   CLIENT HUE — data, not chrome.
+   Each client brand carries one colour. It may tint the client chip, the
+   switcher row and generated artwork. It may NEVER colour a button, a
+   status, a link or any part of the cockpit's own chrome — otherwise the UI
+   changes meaning when the operator switches client.
+   Re-tuned warm so a client hue sits on bone without clashing with cobalt.
+   ========================================================================== */
+[data-client="ridgeline"]{ --client:#A6522E; --client-2:#D98A3F; }
+[data-client="tallow"]   { --client:#3F5DA8; --client-2:#7A96DC; }
+[data-client="northbeam"]{ --client:#6A4E93; --client-2:#9B7FC4; }
+[data-client="feltmade"] { --client:#2F6F5E; --client-2:#58A08B; }
+
+:root[data-theme="dark"] [data-client="ridgeline"]{ --client:#D98A5F; --client-2:#E8AC80; }
+:root[data-theme="dark"] [data-client="tallow"]   { --client:#8CA6E8; --client-2:#B0C2F1; }
+:root[data-theme="dark"] [data-client="northbeam"]{ --client:#A98BD1; --client-2:#C4AEE2; }
+:root[data-theme="dark"] [data-client="feltmade"] { --client:#5FB09A; --client-2:#8ACBBA; }
+
+/* ==========================================================================
+   PRIMITIVES
+   ========================================================================== */
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-ui);
+  font-size:var(--t-body);
+  line-height:var(--lh-base);
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+h1,h2,h3{ text-wrap:balance; }
+
+/* THE PLATE — the label above a thing. Section heads, column heads, legends.
+   v2.2: SENTENCE CASE (founder decision 2026-08-24). It was uppercase +
+   wide tracking, borrowed from instrument panels. On a page a human reads
+   for pleasure that shouts, and all-caps costs reading speed because word
+   shapes flatten. Sentence case at 13px is calmer and reads faster. The
+   label still does its job through weight and colour, not volume. */
+.plate{
+  font-family:var(--f-ui);
+  font-size:var(--t-sm);
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--ink-2);
+  line-height:1.25;
+}
+/* The one place volume is still right: a dense instrument column head, where
+   the label must not be confused with the data under it. Opt in explicitly. */
+.plate.is-instrument{
+  font-size:var(--t-plate);
+  letter-spacing:var(--tr-plate);
+  text-transform:uppercase;
+  color:var(--ink-3);
+  line-height:1;
+}
+
+/* DISPLAY — the loud voice. Width does the work, so this stays legible at
+   sizes an instrument screen can actually afford. */
+.display{
+  font-family:var(--f-display);
+  font-variation-settings:'wdth' var(--wd-display);
+  font-weight:800;
+  letter-spacing:-.03em;
+  line-height:1.02;
+}
+/* the quieter width, for a heading inside a dense surface */
+.display.is-mid{ font-variation-settings:'wdth' var(--wd-display-mid); font-weight:700; }
+
+/* SERIF — kept for the surfaces that still reference it (approval page's
+   client name). It is NO LONGER the display face; Archivo is. Retire this
+   once those surfaces are re-cut. */
+.serif{
+  font-family:var(--f-serif);
+  font-weight:400;
+  letter-spacing:var(--tr-serif);
+}
+
+/* MACHINE RECORD — mono is a semantic, not a texture. If a human wrote it,
+   it is Instrument Sans. */
+.rec{
+  font-family:var(--f-mono);
+  font-variant-numeric:tabular-nums lining-nums;
+  font-size:var(--t-micro);
+  letter-spacing:-.01em;
+  color:var(--ink-2);
+}
+
+/* MONEY — always tabular, always mono, always locked on the decimal. */
+.money{
+  font-family:var(--f-mono);
+  font-variant-numeric:tabular-nums lining-nums;
+  font-feature-settings:"tnum" 1,"lnum" 1;
+  text-align:right;
+  white-space:nowrap;
+}
+
+.figure{
+  font-family:var(--f-ui);
+  font-size:var(--t-figure);
+  font-weight:600;
+  font-variant-numeric:tabular-nums lining-nums;
+  line-height:var(--lh-tight);
+  letter-spacing:var(--tr-figure);
+  color:var(--ink);
+}
+/* money always wins over display sizing: there is no exception to
+   "money is mono + tabular". */
+.figure.money{
+  font-family:var(--f-mono);
+  font-weight:500;
+  letter-spacing:-.03em;
+  text-align:left;
+}
+
+/* CHIP — soft ground + strong ink. Sentence case since v2.2. */
+.chip{
+  display:inline-flex; align-items:center; gap:var(--s-15);
+  padding:3px var(--s-2);
+  border-radius:var(--r-full);
+  font-size:var(--t-xs);
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+  white-space:nowrap; line-height:1.5;
+  border:var(--bw) solid transparent;
+}
+.chip::before{
+  content:""; width:6px; height:6px; border-radius:var(--r-full);
+  background:currentColor; flex:none;
+}
+.chip.is-ok     { background:var(--ok-soft);     color:var(--ok);     border-color:color-mix(in srgb,var(--ok) 22%,transparent); }
+.chip.is-warn   { background:var(--warn-soft);   color:var(--warn);   border-color:color-mix(in srgb,var(--warn) 22%,transparent); }
+.chip.is-danger { background:var(--danger-soft); color:var(--danger); border-color:color-mix(in srgb,var(--danger) 22%,transparent); }
+.chip.is-held   { background:var(--held-soft);   color:var(--held);   border-color:color-mix(in srgb,var(--held) 22%,transparent); }
+.chip.is-brand  { background:var(--brand-soft);  color:var(--brand);  border-color:color-mix(in srgb,var(--brand) 22%,transparent); }
+.chip.is-idle   { background:var(--surface-sunk);color:var(--ink-3);  border-color:var(--line); }
+.chip.is-idle::before{ background:var(--decor); }
+
+/* UNREVIEWED — the third verdict state, added v2.4 after Marketing's
+   adoption report. It is NOT a warning and NOT "held".
+     · warn  = a human needs to do something
+     · held  = parked on purpose (an ad staged PAUSED)
+     · unreviewed = NO VERDICT EXISTS. Nobody and nothing judged this.
+   Marketing rendered it as chip--warn; Design's own dashboard rendered it as
+   is-held. Both were wrong in the same direction: they described a state
+   where the truth is the ABSENCE of one, which is exactly what D-005 exists
+   to stop. The dashed edge is the point — an outline nobody filled in. */
+.chip.is-unreviewed{
+  background:var(--surface-sunk); color:var(--ink-2);
+  border-style:dashed; border-color:var(--line-strong);
+}
+.chip.is-unreviewed::before{
+  background:none; border:1.5px dashed var(--decor); width:7px; height:7px;
+}
+
+/* ══ DEGRADED — a panel with nothing to show, added v2.4 ═══════════════
+   The product's worst historical defect was a panel rendering blank instead
+   of saying why. A blank panel is indistinguishable from a broken one, and
+   the operator's next move is to reload and lose their place.
+
+   THE RULE: a component with no data must render three things, never zero —
+     1. WHAT is missing        (one line, plain)
+     2. WHY it is missing      (the actual reason, not "an error occurred")
+     3. THE ONE THING TO DO    (a real control, or an honest "nothing yet")
+
+   It is deliberately NOT --danger. Missing data is usually not a failure;
+   treating every gap as an error teaches the operator to ignore red. */
+.degraded{
+  display:grid; gap:var(--s-2); justify-items:start;
+  padding:var(--s-4);
+  border:var(--bw) dashed var(--line-strong);
+  border-radius:var(--r-lg);
+  background:var(--surface-sunk);
+  color:var(--ink-2);
+}
+.degraded-what{
+  font-family:var(--f-ui); font-size:var(--t-sm); font-weight:650;
+  color:var(--ink);
+}
+.degraded-why{ font-size:var(--t-xs); color:var(--ink-2); max-width:52ch;
+               line-height:1.55; }
+/* the machine's own words, when there are any — never paraphrased */
+.degraded-why .rec{ display:block; margin-top:var(--s-1); }
+.degraded > .btn{ margin-top:var(--s-1); }
+/* when there is genuinely nothing to do, say so rather than showing a
+   disabled button, which reads as broken */
+.degraded-none{ font-size:var(--t-xs); color:var(--ink-3); font-style:italic; }
+
+/* ══ WORKING — long work, added v2.4 ═══════════════════════════════════
+   Generation takes seconds to minutes. Canon had no pattern for it, so the
+   product showed nothing and read as hung.
+
+   THE RULE: motion is not the message. Reduced motion removes the ANIMATION,
+   never the INFORMATION — the label stays, so a reader who cannot see
+   movement still knows work is running. A spinner alone fails that test. */
+.working{
+  position:relative; overflow:hidden;
+  display:inline-flex; align-items:center; gap:var(--s-2);
+  font-size:var(--t-xs); color:var(--brand); font-weight:600;
+}
+.working::before{
+  content:""; width:9px; height:9px; border-radius:var(--r-full); flex:none;
+  background:var(--brand);
+  animation:work-pulse 1.5s var(--ease) infinite;
+}
+
+/* ── THE PAYLOAD, NEVER THE ENVELOPE (D-033) ────────────────────────────
+   Four defects in one endpoint family, and they are one defect:
+
+     W1  success-shaped body, dead worker    → looks like it is running
+     W2  success-shaped body, WRONG SUBJECT  → looks like your client's data
+     W3  HTTP 200, error body                → looks fine to an r.ok guard
+     D8  decisions dropped in silence        → looks like it saved
+
+   Every one of them: the transport said fine and the content did not. An HTTP
+   status, an absent `error` field, and the fact that a request came back at
+   all are ENVELOPE. Nothing may be rendered on the strength of an envelope.
+
+   THE FIRST OBLIGATION IS IDENTITY, and it is the one that bites hardest.
+   A surface NEVER labels data with the name it ASKED FOR. It labels data with
+   the name the RESPONSE RETURNED. If the two differ, that is not a rendering
+   decision — it is .degraded, and nothing of the subject's data is drawn.
+
+   Why this is canon's problem and not only theirs: their /api/* resolves an
+   unknown ?client= to the FIRST client and renders it normally
+   (server.py:527, W2). A builder wiring approval.html would naturally put the
+   REQUESTED name in .from-name, because that is the only name they have — and
+   the page would then show one client's batch under another client's name, on
+   a surface whose entire purpose is that a client approves their own work.
+   W1 produced a spinner that was visibly stuck. This produces a page that
+   looks perfect and is about somebody else.
+
+   The markup contract is therefore: the element carrying the subject's name
+   is the ECHOED name. Mark it `data-echoed` so a reader of the markup knows
+   the value is not the one that was typed. --client hue follows the same
+   rule; a hue keyed to the requested name is the same lie in colour. */
+
+/* ── .working IS NEVER A TERMINAL STATE (D-030) ─────────────────────────
+   Added after Marketing's W1. Their POST /api/run accepts an unlisted client
+   name and returns {"job":"job-1","error":null} — success-shaped, with a job
+   id — and the worker then dies inside its own error handler. GET /api/job
+   reports {"state":"running","log":""} FOREVER after that. A dead run and a
+   slow run are the same response.
+
+   Wire .working to that endpoint and canon renders a permanent, perfectly
+   compliant "working" label. The component would be doing exactly what it
+   was specified to do, and the operator would wait all day. This is D-022 in
+   the product: if a broken thing looks the same as a healthy one, it is not
+   evidence.
+
+   THE RULE. A surface that shows .working owes two things before it may:
+     1. a source that can report NOT-RUNNING — and the poller stops on ANY
+        non-running state, never only on success;
+     2. a STALL FACE, which is .degraded — what, why, one action. Stalled is
+        not a spinner and it is not an error: nobody failed, the process is
+        simply gone.
+   Recorded figures do not become a live clock while stalled. An elapsed time
+   that keeps counting after the last recorded event is an invented number,
+   which is D-019's rule about money applied to time.
+
+   For this product specifically: poll /api/progress, which carries `stalled`
+   (STALE_AFTER_S = 15 min, progressview.py:31,126-135, VERIFIED-BY-TEST
+   tests/test_phasec_fixes.py:338). Never /api/job. */
+.working[data-stalled]{ display:none; }
+@keyframes work-pulse{ 0%,100%{ opacity:1; transform:scale(1); }
+                       50%   { opacity:.45; transform:scale(.72); } }
+
+/* the sweep, for a ROW that is working — proven on the calm-layer draft.
+   2.9s deliberately: at 1.6s the founder read it as hurried. */
+.is-working{ position:relative; overflow:hidden; }
+.is-working::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(90deg,transparent,
+    color-mix(in srgb,var(--brand) 9%,transparent),transparent);
+  transform:translateX(-100%);
+  animation:work-sweep 2.9s var(--ease) infinite;
+}
+@keyframes work-sweep{ to{ transform:translateX(100%); } }
+
+/* an indeterminate bar, for a PANEL that is working */
+.working-bar{
+  height:3px; border-radius:var(--r-full); overflow:hidden;
+  background:var(--surface-sunk); position:relative;
+}
+.working-bar::after{
+  content:""; position:absolute; inset-block:0; inline-size:38%;
+  border-radius:inherit; background:var(--brand);
+  animation:work-bar 1.7s var(--ease) infinite;
+}
+@keyframes work-bar{ from{ inset-inline-start:-38%; } to{ inset-inline-start:100%; } }
+
+@media (prefers-reduced-motion: reduce){
+  /* the label survives; only the movement stops */
+  .working::before, .is-working::after, .working-bar::after{ animation:none; }
+  .working-bar::after{ inset-inline-start:0; inline-size:100%; opacity:.5; }
+}
+
+/* UNDECIDED — the HUMAN's absent answer, added v2.8.
+   Distinct from .is-unreviewed, which is the MACHINE's absent verdict. The two
+   look like one state and are not:
+
+     is-unreviewed  nothing judged this. The owner is the engine. The next
+                    action is to run the gate — or to accept that it did not run.
+     is-undecided   a named person has not answered yet. The owner is that
+                    person. The next action is theirs, and the surface is
+                    usually asking them for it.
+
+   On the approval page both can be true of the same creative at once — the gate
+   passed it and the client has not looked — and a screen that cannot say
+   "we checked it, you haven't" is failing at its only job.
+
+   Not dashed: the dashed edge belongs to is-unreviewed, where the outline was
+   never filled in. This one is a real, open question with a real owner, so it
+   keeps a solid edge and reads as an invitation rather than a gap. */
+.chip.is-undecided{
+  background:var(--surface-2); color:var(--ink-2);
+  border-color:var(--line-strong);
+}
+.chip.is-undecided::before{ background:var(--ink-3); }
+
+/* ══ STALENESS — brief §7.7. A cached number that says so ═══════════════
+   One treatment everywhere, so staleness reads as honesty rather than decay.
+   A stale number that admits it beats a blocking page, and it beats a fresh
+   number the operator cannot trust because they cannot tell which it is.
+
+   RULE: attaches to the FIGURE, never to the panel. A panel-level stamp makes
+   the reader guess which of the numbers under it are cached. */
+.stale{
+  font-family:var(--f-mono); font-size:var(--t-plate-sm);
+  color:var(--ink-3); white-space:nowrap; font-variant-numeric:tabular-nums;
+}
+.stale::before{ content:"· "; }
+/* past a threshold the product defines, staleness stops being incidental */
+.stale.is-old{ color:var(--warn); }
+
+/* ══ ILLUSTRATIVE — brief §7.9. Sample data, everywhere it can be seen ═════
+   Until Insights returns live data every demo of this product wears this, so
+   it deserves a designed treatment rather than an apology.
+
+   NOT a watermark. A watermark over content is unreadable at small sizes and
+   is the first thing a crop removes. This sits ADJACENT TO THE FIGURES it
+   qualifies, so a screenshot of the panel carries the label with it — the
+   screenshot is the distribution channel this has to survive. */
+.illustrative{
+  display:inline-flex; align-items:center; gap:var(--s-15);
+  font-family:var(--f-ui); font-size:var(--t-plate); font-weight:600;
+  color:var(--warn); background:var(--warn-soft);
+  border:var(--bw) solid color-mix(in srgb,var(--warn) 26%,transparent);
+  border-radius:var(--r-sm); padding:var(--s-05) var(--s-2);
+  white-space:nowrap;
+}
+.illustrative::before{
+  content:""; width:6px; height:6px; flex:none;
+  background:var(--warn); transform:rotate(45deg);   /* a diamond, not a dot:
+     the dot vocabulary belongs to chips, which state a REAL status. This is
+     not a status — it is a warning about the whole reading. */
+}
+/* the band form, for a whole screen rather than one panel */
+.illustrative-band{
+  background:var(--warn-soft);
+  border-block-start:var(--bw) solid color-mix(in srgb,var(--warn) 28%,transparent);
+  color:var(--ink-2); font-size:var(--t-xs);
+}
+
+/* ══ PACING — brief §7.5. Crossing the budget, not escaping the box ══════
+   The real computed case is 179% ($2,681 run rate on a $1,500 monthly budget,
+   config/brand.toml:44). A bar clamped at 100% draws over-budget and
+   exactly-on-budget as the same picture, so the excess has to be visible.
+
+   TWO EARLIER CUTS OF THIS WERE WRONG, and the second is the instructive one:
+   painting the excess a different colour inside the track makes over-budget a
+   colour change only; then making it physically overflow the track worked in
+   isolation but was clipped the moment an ancestor had overflow:hidden — a
+   system component cannot depend on every future container being permissive.
+
+   So the budget stops being the END of the track and becomes a MARKED LINE
+   inside it. The track is the whole spend; the tick is the budget; the bar
+   visibly crosses it. Nothing overflows, it survives any container, and it
+   reads proportionally — at 179% you can see how far past the line you are,
+   which the escaping version never showed.
+
+   Geometry, computed by the caller:
+     --pace-tick: 100 / pct        e.g. 179% -> tick at 55.9%
+     the fill is always the full track; the over segment starts at the tick */
+.pace{
+  position:relative; height:8px; border-radius:var(--r-full);
+  background:var(--surface-sunk); border:var(--bw) solid var(--line);
+  overflow:hidden;                /* safe now: nothing needs to escape */
+}
+.pace > i{
+  position:absolute; inset-block:0; inset-inline-start:0;
+  display:block; background:var(--ok-fill);
+}
+.pace.is-over > i{ background:var(--warn-fill); }
+/* the excess, from the budget line to the end of the spend */
+.pace > i.over{
+  inset-inline-start:var(--pace-tick,100%); inset-inline-end:0;
+  inline-size:auto; background:var(--danger-fill);
+}
+/* the budget line itself — the thing being crossed */
+.pace.is-over::after{
+  content:""; position:absolute; inset-block:-2px;
+  inset-inline-start:var(--pace-tick,100%);
+  inline-size:2px; background:var(--surface); z-index:2;
+}
+.pace-figure{
+  font-family:var(--f-mono); font-variant-numeric:tabular-nums;
+  font-size:var(--t-sm); font-weight:500;
+}
+.pace-figure.is-over{ color:var(--danger); }
+
+/* ══ TAPE — brief §7.4. A scrolling record that keeps its total ═══════════
+   The fade stays; it is the right signal that more exists. The total does not
+   scroll away with it, because the total is the number the operator scrolled
+   looking for. */
+.tape{ position:relative; overflow-y:auto; }
+.tape::after{
+  content:""; position:sticky; inset-block-end:0; display:block; height:var(--s-8);
+  margin-block-start:calc(-1 * var(--s-8)); pointer-events:none;
+  background:linear-gradient(180deg,transparent,var(--surface));
+}
+.tape-cap{
+  position:sticky; inset-block-end:0; z-index:2;
+  display:flex; align-items:baseline; gap:var(--s-3);
+  padding-block:var(--s-2); background:var(--surface);
+  border-block-start:var(--bw) solid var(--line-strong);
+  font-size:var(--t-sm); font-weight:650;
+}
+.tape-cap .money{ margin-inline-start:auto; }
+
+/* ══ MONEY CELL — D-019 / M-006. Three states, never two ══════════════════
+   Promoted out of cockpit.html's own <style> block on 2026-08-24. It had
+   lived there since the ruling was made, which meant the canonical shape of
+   a money cell was discoverable only by reading one page's source — the
+   exact fault D-009 named: a system nobody can find is not a system, it is a
+   stylesheet. Marketing recorded in M-006 that they were building the markup
+   and HOLDING THE STYLING until this landed. It never landed until now.
+
+     fresh      the figure and its time. Nothing special.
+     stale      the figure and .stale — "as of 09:02". Legitimate and useful;
+                a cached number that says so beats a blocking page.
+     never run  there IS no figure. A brand onboarded this morning has not
+                spent, and "$0.00 as of —" is a measurement we never took.
+                It renders as an em dash and a reason, never as a zero.
+
+   The middle state is the one that needs the stamp. The third is the one that
+   must never be allowed to look like the first, and $0.00 is exactly how that
+   happens — the same defect as printing a QA pass nobody recorded. */
+.spend{ text-align:right; align-self:center; }
+.spend .money{ font-size:var(--t-lg); font-weight:500; display:block;
+               letter-spacing:var(--tr-figure); }
+.spend small{ font-size:var(--t-plate-sm); color:var(--ink-3); display:block; }
+.spend .stale{ display:block; }
+/* never run: the em dash is not a figure, so it does not get figure weight */
+.spend.is-none .money{ color:var(--ink-3); font-family:var(--f-mono); }
+
+/* ══ HAND-OFF — D-014.1. A switch with a light on it ══════════════════════
+   Getting a review link to a client who has no Meta login. The product runs
+   on the operator's own machine, so there is no hosted page to link to: a
+   tunnel is opened on demand, for a bounded window, at an unguessable
+   per-run path (M-002).
+
+   THE RULE: this is not a share widget, it is a switch with a light on it.
+   The link is alive because that laptop is on. So the RESTING state — which
+   the operator sees far more often than the active one, and which was the
+   open question in the brief — states the fact that is currently true about
+   the world, instead of showing an empty box with a button in it. Rest,
+   closed, open and failed are one shape: what is true, why, and the action.
+   Only .is-open has anything to point a phone at.
+
+   Export is a PEER, not a fallback (D-014). It has to be familiar at rest,
+   because in the degraded case it is the only path left, and an action a
+   person meets for the first time inside an error is one they will not
+   trust. Failure uses .degraded unchanged — no new vocabulary for it. */
+.handoff{
+  display:grid; grid-template-columns:minmax(0,1fr);
+  column-gap:var(--s-6); align-items:start;
+  padding-block-start:var(--s-4);
+  border-block-start:var(--bw) solid var(--line);
+}
+.handoff-main{ display:grid; gap:var(--s-3); justify-items:start; min-width:0; }
+.handoff-state{ font-size:var(--t-sm); font-weight:650; color:var(--ink); }
+.handoff-why{ font-size:var(--t-xs); color:var(--ink-2); line-height:1.55; max-width:54ch; }
+.handoff-do{ display:flex; flex-wrap:wrap; gap:var(--s-2); align-items:center; }
+
+/* OPEN — two columns: the thing you read, and the thing you point a phone
+   at. At rest the second column does not exist, because there is nothing
+   to encode. */
+/* The reading column is capped at a measure, and the QR sits immediately
+   beside it rather than being flung to the far edge of whatever container
+   this lands in. Uncapped, the window bar spans the full panel and stops
+   reading as a gauge belonging to the link above it — it reads as a rule. */
+.handoff.is-open{
+  grid-template-columns:minmax(0,42rem) auto;
+  justify-content:start; column-gap:var(--s-8);
+}
+
+/* The path is shown in full, and the unguessable half is the emphasised
+   half. Truncating it into a tidy pill would hide the only evidence the
+   operator has that the link is not guessable. */
+.handoff-url{
+  display:flex; align-items:center; gap:var(--s-3);
+  flex-wrap:wrap; width:100%;
+}
+.handoff-url code{
+  font-family:var(--f-mono); font-size:var(--t-micro); color:var(--ink-2);
+  overflow-wrap:anywhere; min-width:0;
+}
+.handoff-url code b{ color:var(--ink); font-weight:600; }
+
+/* The window, as a proportion. "42 minutes" reads identically whether the
+   window was 45 minutes or eight hours; this does not. The figures stay in
+   the text, so a reader who cannot see the bar loses nothing. */
+.handoff-bar{
+  display:block; width:100%; height:3px; border-radius:var(--r-full);
+  background:var(--line); background-repeat:no-repeat;
+  background-image:linear-gradient(90deg,
+    var(--brand) 0 var(--handoff-left,100%), transparent var(--handoff-left,100%));
+}
+.handoff-window{
+  display:flex; align-items:center; gap:var(--s-3); flex-wrap:wrap;
+  font-size:var(--t-xs); color:var(--ink-2);
+}
+.handoff-window .clock{ font-family:var(--f-mono); font-size:var(--t-micro); color:var(--ink); }
+.handoff-window > * + *::before{ content:"· "; color:var(--ink-3); }
+
+/* QR — the same token in a reader a phone can use, never decoration. Fixed
+   size because a QR below a scannable module size is an ornament. The
+   caption sits OUTSIDE the light patch so it stays a themed token on a
+   themed ground. */
+.handoff-qr{ display:grid; gap:var(--s-2); justify-items:center; margin:0; width:max-content; }
+.handoff-qr svg{
+  display:block; width:128px; height:128px; padding:var(--s-2);
+  border-radius:var(--r-sm);
+  background:var(--qr-ground); color:var(--qr-ink);
+  border:var(--bw) solid var(--line-strong);
+}
+.handoff-qr figcaption{
+  font-size:var(--t-plate-sm); color:var(--ink-3);
+  max-width:22ch; text-align:center; line-height:1.4;
+}
+
+@media (max-width:720px){
+  .handoff.is-open{ grid-template-columns:minmax(0,1fr); row-gap:var(--s-4); }
+  .handoff-qr{ justify-self:start; }
+}
+
+/* ══ DECIDING AS — D-014.2. A label, never a credential ═══════════════════
+   The client page gets forwarded. A second person opens it on a phone, and
+   that person has to see at a glance that the name is a label they can
+   correct — because if they assume the system knows who they are, they
+   decide, and the record carries somebody else's name.
+
+   THE RULE: it reads as a form field that has been filled in, not as a
+   status. A filled field is the most legible "you can change this" object
+   in any interface. So: no avatar, no initials, no lock, no tick — those
+   three conventions are most of what makes a name read as authentication —
+   and never in chrome position. It sits beside the consequential action,
+   because that is the moment the claim matters.
+
+   The dashed underline is not decoration. Canon already uses a dashed edge
+   to mean THE MACHINE HAS NOT ASSERTED THIS (.chip.is-unreviewed, D-009;
+   .degraded). Same meaning, reused rather than invented. The copy never
+   says signed in, verified, or authenticated. */
+.deciding{
+  display:inline-flex; align-items:center; gap:var(--s-1); flex-wrap:wrap;
+  font-size:var(--t-xs); color:var(--ink-2);
+}
+.deciding-name{
+  font-weight:650; color:var(--ink);
+  /* --decor, not --line-strong: this dashed rule is the ONLY signal that the
+     name is correctable, so it has to be seen. Canon already uses --decor for
+     the dashed mark on .chip.is-unreviewed, which carries the same meaning. */
+  border-block-end:1px dashed var(--decor);
+  padding-block-end:1px;
+}
+/* Unset. Not "Anonymous" and not blank: the same object, unfilled, saying
+   what the name is for and that it is the reader's to give. */
+.deciding.is-unnamed .deciding-name{
+  font-weight:400; font-style:italic; color:var(--ink-2);
+}
+.deciding-change{
+  font:inherit; font-size:var(--t-xs); font-weight:600;
+  color:var(--brand); background:none; border:0; cursor:pointer;
+  text-decoration:underline; text-underline-offset:2px;
+  /* a real 44px target without a 44px line box — the send bar is a phone
+     surface and this control is small enough to miss */
+  min-height:44px; display:inline-flex; align-items:center;
+  padding-inline:var(--s-15); margin-inline-start:calc(-1 * var(--s-15));
+  margin-block:calc(-1 * var(--s-3));
+  border-radius:var(--r-xs);
+}
+.deciding-change:hover{ color:var(--brand-strong); }
+.deciding-show,
+.deciding-edit{ display:inline-flex; align-items:center; gap:var(--s-1); flex-wrap:wrap; }
+.deciding-edit{ gap:var(--s-2); }
+/* [hidden] is display:none in the UA sheet, at specificity 0 — any class that
+   sets display beats it and the element stays visible. Every component here
+   that hides a child by attribute needs this, so it lives with the component. */
+.deciding [hidden]{ display:none; }
+.deciding-edit input{
+  font:inherit; font-size:var(--t-md); color:var(--ink);
+  background:var(--surface); border:var(--bw) solid var(--line-strong);
+  border-radius:var(--r-sm); padding:var(--s-2) var(--s-3);
+  min-height:44px; min-width:12ch; max-width:22ch;
+}
+/* the UA placeholder grey measured 2.88:1 on this system's paper the last
+   time it was left to default — it is real text and it takes a real token */
+.deciding-edit input::placeholder{ color:var(--ink-3); opacity:1; }
+
+/* SOLID — the one chip that fills. Reserved for the single row that is
+   live right now; everything else stays soft so this reads at a glance. */
+.chip.is-solid{ background:var(--brand); color:var(--brand-ink); border-color:transparent;
+                box-shadow:var(--shadow-2); }
+.chip.is-solid::before{ background:currentColor; }
+
+/* FOCUS — one ring, everywhere, never removed. */
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:2px solid var(--focus);
+  outline-offset:2px;
+  border-radius:var(--r-xs);
+}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--s-2);
+  text-decoration:none;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  /* 44px, not 36. 36 is the comfortable desktop height and it is what this
+     button had, but the same class ships to a touch surface and 36 fails the
+     minimum target there. Every .btn on the dashboard measured 36px. */
+  min-height:44px; padding:var(--s-2-5, .65rem) var(--s-4);
+  border-radius:var(--r-md);
+  border:var(--bw) solid var(--line-strong);
+  background:var(--surface-2); color:var(--ink);
+  box-shadow:var(--shadow-1), var(--edge);
+  font-family:var(--f-ui); font-size:var(--t-sm); font-weight:600;
+  cursor:pointer;
+  transition:background var(--dur-fast) var(--ease),
+             border-color var(--dur-fast) var(--ease),
+             box-shadow var(--dur-fast) var(--ease),
+             transform var(--dur-fast) var(--ease);
+}
+.btn:hover{ background:var(--surface-sunk); border-color:var(--decor); }
+.btn:active{ transform:translateY(1px); box-shadow:var(--shadow-press); }
+.btn[disabled]{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+.btn[disabled]:hover{ background:var(--surface-2); border-color:var(--line-strong); }
+
+.btn-primary{
+  background:var(--brand); border-color:var(--brand); color:var(--brand-ink);
+  box-shadow:var(--shadow-2);
+}
+.btn-primary:hover{ background:var(--brand-strong); border-color:var(--brand-strong); }
+
+.btn-lg{ min-height:48px; padding:var(--s-3) var(--s-5); font-size:15px; }
+.btn-quiet{ background:transparent; border-color:transparent; color:var(--ink-2); box-shadow:none; }
+.btn-quiet:hover{ background:var(--surface-sunk); border-color:transparent; }
+
+/* CARD */
+.card{
+  background:var(--surface);
+  border:var(--bw) solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-2);
+}
+
+.hr{ height:1px; background:var(--line); border:0; margin:0; }
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; scroll-behavior:auto !important;
+  }
+}
